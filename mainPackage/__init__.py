@@ -5,10 +5,12 @@ Created on Jun 6, 2016
 
 ''' 
 import pygame
+from pygame.constants import K_DOWN, K_UP, K_RIGHT, K_LEFT, K_SPACE
  
 # Define some colors
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
+BLUE = (0,0,255)
 GREEN = (0, 255, 0)
 RED = (255, 0, 0)
  
@@ -28,14 +30,6 @@ done = False
 # Used to manage how fast the screen updates
 clock = pygame.time.Clock()
 
-# Starting position of Rectangle
-rect_x = 50
-rect_y = 50
- 
-# Rectangle speed and direction 
-rect_vx = 2
-rect_vy = 2
-
 
 class Circle:
     def __init__(self, initX, initY, radius, dx, dy, color):
@@ -48,17 +42,78 @@ class Circle:
         
     def draw(self, surface):
         pygame.draw.circle(surface, self.color, [self.x , self.y], self.radius);
+        
+    def update(self):
+        self.x += self.dx
+        self.y += self.dy
+        
+        if self.x >= WIDTH - self.radius or self.x <= self.radius:
+            self.dx *= -1
+         
+        if self.y >= HEIGHT - self.radius or self.y <= self.radius:
+            self.dy *= -1
 
 
-circLs = [Circle(20, 20, 10, 1, 1, WHITE) , Circle(40, 120, 10, 1, 1, WHITE) ]
+circLs = [Circle(20, 20, 10, 5, 5, WHITE) , Circle(40, 120, 10, 1, 1, WHITE) ]
 
+
+# UP = 1
+# DOWN = 2
+# RIGHT = 3
+# LEFT = 4
+class Hero:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.d = K_SPACE
+        self.o = K_UP
+    
+    def update(self):
+        if self.x >= WIDTH or self.x <= 0 or self.y >= HEIGHT or self.y <= 0:
+            self.d = K_SPACE
+        
+        if self.d == K_DOWN:
+            hero.y += 2
+        elif self.d == K_UP:
+            hero.y -= 2
+        elif self.d == K_RIGHT:
+            hero.x += 2
+        elif self.d == K_LEFT:
+            hero.x -= 2
+        
+             
+        
+    def draw(self, surface):
+    	p = [() , () , ()]
+        if self.o == K_DOWN:
+            pos = [(self.x + p[0][0], self.y - p[0][1]), (self.x + p[1][0],self.y - p[1][1]), (self.x + p[2][0],self.y - p[2][1])];
+        elif self.o == K_UP:
+            pos = [(self.x + p[0][0], self.y + p[0][1]), (self.x + p[1][0],self.y + p[1][1]), (self.x + p[2][0],self.y + p[2][1])];
+        elif self.o == K_RIGHT:
+            pos = [(self.x - p[0][1], self.y + p[0][0]), (self.x + p[1][1],self.y + p[1][0]), (self.x + p[2][1],self.y + p[2][0])];
+        elif self.o == K_LEFT:
+            pos = [(self.x + p[0][1], self.y + p[0][0]), (self.x + p[1][1],self.y + p[1][0]), (self.x + p[2][1],self.y + p[2][0])];
+        pygame.draw.polygon(surface, BLUE, pos)
+
+hero = Hero(WIDTH/2, HEIGHT/2)
 # -------- Main Program Loop -----------
 while not done:
     # --- Main event loop
     for event in pygame.event.get():
+        print(event.type)
         if event.type == pygame.QUIT:
             done = True
- 
+        elif event.type == pygame.KEYDOWN:
+            if event.key == K_DOWN or event.key == K_UP or event.key == K_RIGHT or event.key == K_LEFT:
+                hero.d = event.key
+                hero.o = event.key
+        elif event.type == pygame.KEYUP:
+            hero.d = K_SPACE
+            
+                
+           
+            
+#     print(pygame.KEYDOWN)
     # --- Game logic should go here
  
     # --- Screen-clearing code goes here
@@ -74,17 +129,12 @@ while not done:
     
     # Draw rectangle
     for c in circLs:
+        c.update()
         c.draw(screen)
     
-    # Move Rectangle
-    rect_x += rect_vx
-    rect_y += rect_vy
+    hero.update()
+    hero.draw(screen)
     
-    if rect_x >= WIDTH - 50 or rect_x <= 0:
-        rect_vx = -rect_vx
-         
-    if rect_y >= HEIGHT - 50 or rect_y <= 0:
-        rect_vy = -rect_vy
     # --- Go ahead and update the screen with what we've drawn.
     pygame.display.flip()
  
