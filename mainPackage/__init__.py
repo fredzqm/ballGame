@@ -90,7 +90,7 @@ class Hero:
         self.d = K_SPACE
         self.o = K_UP
     
-    def update(self):
+    def update(self,obj,score):
         if self.x >= WIDTH or self.x <= 0 or self.y >= HEIGHT or self.y <= 0:
             self.d = K_SPACE
         
@@ -105,6 +105,7 @@ class Hero:
             
         if distance(self, obj) < 10:
             obj.eaten();
+            score.update(10)
             circLs.append(randomCircle())    
         
     def draw(self, surface):
@@ -121,7 +122,22 @@ class Hero:
         pygame.draw.polygon(surface, BLUE, pos)
 
 hero = Hero(WIDTH/2, HEIGHT/2)
-     
+
+class Score:
+    def __init__(self):
+        self.points = 0
+        self.lives = 3
+        
+    def draw(self,surface):        
+        font = pygame.font.SysFont('Calibri', 20, True, False)
+        points = font.render("Score: " + str(self.points), True, RED)
+        lives = font.render("Lives: " + str(self.lives), True, RED)
+        surface.blit(points,[0,0])
+        surface.blit(lives,[0,20])
+    
+    def update(self, points):
+        self.points += points  
+             
             
 # -------- Main Program Loop -----------
 while not done:
@@ -153,15 +169,20 @@ while not done:
  
     # --- Drawing code should go here
     
-    # Draw rectangle
+    # Draw objects on screen
+    score = Score()
+    score.draw(screen)
+    
     for c in circLs:
         c.update()
         c.draw(screen)
     
-    hero.update()
+    hero.update(obj,score)
     hero.draw(screen)
     
     obj.draw(screen)
+    
+    
     
     # --- Go ahead and update the screen with what we've drawn.
     pygame.display.flip()
