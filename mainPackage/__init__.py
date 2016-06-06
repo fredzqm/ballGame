@@ -89,7 +89,8 @@ class Hero:
         self.y = y
         self.d = K_SPACE
         self.o = K_UP
-    
+        self.lives = 3
+        
     def update(self):
         if self.x >= WIDTH or self.x <= 0 or self.y >= HEIGHT or self.y <= 0:
             self.d = K_SPACE
@@ -102,10 +103,7 @@ class Hero:
             hero.x += 2
         elif self.d == K_LEFT:
             hero.x -= 2
-            
-        if distance(self, obj) < 10:
-            obj.eaten();
-            circLs.append(randomCircle())    
+                
         
     def draw(self, surface):
         # p = [(0 , -30) , (10 , 0) , (20 , -30)]
@@ -136,10 +134,7 @@ while not done:
         elif event.type == pygame.KEYUP:
             hero.d = K_SPACE
             
-                
-           
-            
-#     print(pygame.KEYDOWN)
+    #     print(pygame.KEYDOWN)
     # --- Game logic should go here
  
     # --- Screen-clearing code goes here
@@ -154,14 +149,23 @@ while not done:
     # --- Drawing code should go here
     
     # Draw rectangle
+    hero.update()
+    if distance(hero, obj) < 10:
+        obj.eaten();
+        circLs.append(randomCircle())
+    
     for c in circLs:
+        if distance(hero, c) < 10:
+            hero.lives -= 1;
+            print("Hero get hitten")
+            if hero.lives <= 0:
+                print("Hero dies");
         c.update()
         c.draw(screen)
     
-    hero.update()
     hero.draw(screen)
-    
     obj.draw(screen)
+    
     
     # --- Go ahead and update the screen with what we've drawn.
     pygame.display.flip()
