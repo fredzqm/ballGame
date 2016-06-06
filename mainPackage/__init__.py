@@ -84,14 +84,16 @@ class Hero:
              
         
     def draw(self, surface):
+        # p = [(0 , -30) , (10 , 0) , (20 , -30)]
+        p = [(-10 , -10) , (10 , -10) , (0 , 20)]
         if self.o == K_DOWN:
-            pos = [(self.x + 20, self.y - 50), (self.x + 25,self.y - 30), (self.x + 30,self.y - 50)];
+            pos = [(self.x + p[0][0], self.y + p[0][1]), (self.x + p[1][0],self.y + p[1][1]), (self.x + p[2][0],self.y + p[2][1])];
         elif self.o == K_UP:
-            pos = [(self.x - 10, self.y - 10), (self.x - 15,self.y + 30), (self.x + 30,self.y + 50)];
+            pos = [(self.x + p[0][0], self.y - p[0][1]), (self.x + p[1][0],self.y - p[1][1]), (self.x + p[2][0],self.y - p[2][1])];
         elif self.o == K_RIGHT:
-            pos = [(self.x + 20, self.y + 50), (self.x + 25,self.y + 30), (self.x + 30,self.y + 50)];
+            pos = [(self.x + p[0][1], self.y - p[0][0]), (self.x + p[1][1],self.y - p[1][0]), (self.x + p[2][1],self.y - p[2][0])];
         elif self.o == K_LEFT:
-            pos = [(self.x + 20, self.y + 50), (self.x + 25,self.y + 30), (self.x + 30,self.y + 50)];
+            pos = [(self.x - p[0][1], self.y + p[0][0]), (self.x - p[1][1],self.y + p[1][0]), (self.x - p[2][1],self.y + p[2][0])];
         pygame.draw.polygon(surface, BLUE, pos)
 
 hero = Hero(WIDTH/2, HEIGHT/2)
