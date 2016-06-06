@@ -62,8 +62,6 @@ def randomCircle():
     return Circle(random.randrange(0, WIDTH), random.randrange(0, HEIGHT), 10, 1, 1, WHITE)
 
 
-circLs = [Circle(20, 20, 10, 5, 5, WHITE) , Circle(40, 120, 10, 1, 1, WHITE) ]
-
 class Objs:    
     def __init__(self):
         self.x = 300
@@ -76,8 +74,7 @@ class Objs:
         self.x = random.randrange(0, WIDTH)
         self.y = random.randrange(0, HEIGHT)
         
-        
-obj = Objs()
+ 
 
 # UP = 1
 # DOWN = 2
@@ -89,21 +86,16 @@ class Hero:
         self.y = y
         self.d = K_SPACE
         self.o = K_UP
-        self.lives = 3
         
     def update(self):
-        if self.x >= WIDTH or self.x <= 0 or self.y >= HEIGHT or self.y <= 0:
-            self.d = K_SPACE
-        
-        if self.d == K_DOWN:
+        if self.d == K_DOWN and self.y < HEIGHT:
             hero.y += 2
-        elif self.d == K_UP:
+        elif self.d == K_UP and self.y > 0:
             hero.y -= 2
-        elif self.d == K_RIGHT:
+        elif self.d == K_RIGHT and self.x < WIDTH:
             hero.x += 2
-        elif self.d == K_LEFT:
+        elif self.d == K_LEFT and self.x > 0:
             hero.x -= 2
-                
         
     def draw(self, surface):
         # p = [(0 , -30) , (10 , 0) , (20 , -30)]
@@ -118,8 +110,28 @@ class Hero:
             pos = [(self.x - p[0][1], self.y + p[0][0]), (self.x - p[1][1],self.y + p[1][0]), (self.x - p[2][1],self.y + p[2][0])];
         pygame.draw.polygon(surface, BLUE, pos)
 
-hero = Hero(WIDTH/2, HEIGHT/2)
+
+class Score:
+    def __init__(self):
+        self.points = 0
+        self.lives = 3
+        
+    def draw(self,surface):        
+        font = pygame.font.SysFont('Calibri', 20, True, False)
+        points = font.render("Score: " + str(self.points), True, RED)
+        if self.lives > 0:
+            lives = font.render("Lives: " + str(self.lives), True, RED)
+        else:
+            lives = font.render("Game Over", True, RED)
+        surface.blit(points,[0,0])
+        surface.blit(lives,[0,20])
      
+
+  
+circLs = [Circle(20, 20, 10, 5, 5, WHITE) , Circle(40, 120, 10, 1, 1, WHITE) ]     
+obj = Objs() 
+hero = Hero(WIDTH/2, HEIGHT/2)
+score = Score()           
             
 # -------- Main Program Loop -----------
 while not done:
@@ -151,21 +163,22 @@ while not done:
     # Draw rectangle
     hero.update()
     if distance(hero, obj) < 10:
-        obj.eaten();
+        obj.eaten()
+        score.points += 1
         circLs.append(randomCircle())
+    # Draw objects on screen
     
     for c in circLs:
         if distance(hero, c) < 10:
-            hero.lives -= 1;
             print("Hero get hitten")
-            if hero.lives <= 0:
-                print("Hero dies");
+            score.lives -= 1
         c.update()
         c.draw(screen)
     
+    hero.update()
     hero.draw(screen)
     obj.draw(screen)
-    
+    score.draw(screen)
     
     # --- Go ahead and update the screen with what we've drawn.
     pygame.display.flip()
