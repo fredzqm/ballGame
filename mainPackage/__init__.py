@@ -81,7 +81,9 @@ class Hero:
         elif self.d == K_LEFT:
             hero.x -= 2
         
-             
+    def collide(self):
+        pass
+                 
         
     def draw(self, surface):
         # p = [(0 , -30) , (10 , 0) , (20 , -30)]
@@ -97,6 +99,17 @@ class Hero:
         pygame.draw.polygon(surface, BLUE, pos)
 
 hero = Hero(WIDTH/2, HEIGHT/2)
+
+class Objs:    
+    def __init__(self):
+        self.x = 300
+        self.y = 300
+     
+    def draw(self, surface):
+        pygame.draw.rect(surface, RED, [self.x,self.y,5,5])
+        
+obj = Objs()        
+            
 # -------- Main Program Loop -----------
 while not done:
     # --- Main event loop
@@ -135,6 +148,8 @@ while not done:
     
     hero.update()
     hero.draw(screen)
+    
+    obj.draw(screen)
     
     # --- Go ahead and update the screen with what we've drawn.
     pygame.display.flip()
