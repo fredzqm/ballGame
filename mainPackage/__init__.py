@@ -35,7 +35,23 @@ rect_y = 50
 # Rectangle speed and direction 
 rect_vx = 2
 rect_vy = 2
- 
+
+
+class Circle:
+    def __init__(self, initX, initY, radius, dx, dy, color):
+        self.x = initX
+        self.y = initY
+        self.radius = radius
+        self.dx = dx
+        self.dy = dy
+        self.color = color
+        
+    def draw(self, surface):
+        pygame.draw.circle(surface, self.color, [self.x , self.y], self.radius);
+
+
+circLs = [Circle(20, 20, 10, 1, 1, WHITE) , Circle(40, 120, 10, 1, 1, WHITE) ]
+
 # -------- Main Program Loop -----------
 while not done:
     # --- Main event loop
@@ -57,7 +73,8 @@ while not done:
     # --- Drawing code should go here
     
     # Draw rectangle
-    pygame.draw.rect(screen, WHITE, [rect_x, rect_y, 50, 50])
+    for c in circLs:
+        c.draw(screen)
     
     # Move Rectangle
     rect_x += rect_vx
