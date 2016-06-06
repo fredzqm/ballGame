@@ -4,8 +4,10 @@ Created on Jun 6, 2016
 @author: castonkr
 
 ''' 
-import pygame
+import pygame, math, random
 from pygame.constants import K_DOWN, K_UP, K_RIGHT, K_LEFT, K_SPACE
+from pygame.draw import circle
+from shutil import which
  
 # Define some colors
 BLACK = (0, 0, 0)
@@ -31,6 +33,9 @@ done = False
 clock = pygame.time.Clock()
 
 
+def distance(a , b):
+    return math.sqrt((a.x - b.x)**2 + (a.y - b.y) **2)
+
 class Circle:
     def __init__(self, initX, initY, radius, dx, dy, color):
         self.x = initX
@@ -53,9 +58,26 @@ class Circle:
         if self.y >= HEIGHT - self.radius or self.y <= self.radius:
             self.dy *= -1
 
+def randomCircle():
+    return Circle(random.randrange(0, WIDTH), random.randrange(0, HEIGHT), 10, 1, 1, WHITE)
+
 
 circLs = [Circle(20, 20, 10, 5, 5, WHITE) , Circle(40, 120, 10, 1, 1, WHITE) ]
 
+class Objs:    
+    def __init__(self):
+        self.x = 300
+        self.y = 300
+     
+    def draw(self, surface):
+        pygame.draw.rect(surface, RED, [self.x,self.y,5,5])
+    
+    def eaten(self):
+        self.x = random.randrange(0, WIDTH)
+        self.y = random.randrange(0, HEIGHT)
+        
+        
+obj = Objs()
 
 # UP = 1
 # DOWN = 2
@@ -80,10 +102,10 @@ class Hero:
             hero.x += 2
         elif self.d == K_LEFT:
             hero.x -= 2
-        
-    def collide(self):
-        pass
-                 
+            
+        if distance(self, obj) < 10:
+            obj.eaten();
+            circLs.append(randomCircle())    
         
     def draw(self, surface):
         # p = [(0 , -30) , (10 , 0) , (20 , -30)]
@@ -99,22 +121,12 @@ class Hero:
         pygame.draw.polygon(surface, BLUE, pos)
 
 hero = Hero(WIDTH/2, HEIGHT/2)
-
-class Objs:    
-    def __init__(self):
-        self.x = 300
-        self.y = 300
      
-    def draw(self, surface):
-        pygame.draw.rect(surface, RED, [self.x,self.y,5,5])
-        
-obj = Objs()        
             
 # -------- Main Program Loop -----------
 while not done:
     # --- Main event loop
     for event in pygame.event.get():
-        print(event.type)
         if event.type == pygame.QUIT:
             done = True
         elif event.type == pygame.KEYDOWN:
