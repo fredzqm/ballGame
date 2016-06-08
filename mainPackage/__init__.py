@@ -8,6 +8,7 @@ import pygame, math, random
 from pygame.constants import K_DOWN, K_UP, K_RIGHT, K_LEFT, K_SPACE
 from pygame.draw import circle
 from shutil import which
+from pygame import sprite
  
 # Define some colors
 BLACK = (0, 0, 0)
@@ -33,46 +34,61 @@ done = False
 clock = pygame.time.Clock()
 
 
-def distance(a , b):
-    return math.sqrt((a.x - b.x)**2 + (a.y - b.y) **2)
+# def distance(a , b):
+#     return math.sqrt((a.x - b.x)**2 + (a.y - b.y) **2)
 
-class Circle:
-    def __init__(self, initX, initY, radius, dx, dy, color):
-        self.x = initX
-        self.y = initY
+class Circle(pygame.sprite.Sprite):
+    def __init__(self, x, y, radius, dx, dy, color):
+        super().__init__()
+        self.image = pygame.Surface((radius*2,radius*2));
+        self.image.fill(WHITE)
+        self.image.set_colorkey(WHITE)
+        pygame.draw.circle(self.image, color, [0 , 0], radius);
+        
+        self.rect = self.image.get_rect()
+#         self.rect = pygame.rect(x, y, radius*2,radius*2);
+        self.rect.move(x, y)
+#         self.rect.x = x
+#         self.rect.y = y
         self.radius = radius
         self.dx = dx
         self.dy = dy
-        self.color = color
+#         self.color = color
         
-    def draw(self, surface):
-        pygame.draw.circle(surface, self.color, [self.x , self.y], self.radius);
+#     def draw(self, surface):
+#         pygame.draw.circle(surface, self.color, [self.rect.x , self.rect.y], self.radius);
         
     def update(self):
-        self.x += self.dx
-        self.y += self.dy
+        self.rect.move(self.dx, self.dy)
+#         self.rect.x += self.dx
+#         self.rect.y += self.dy
         
-        if self.x >= WIDTH - self.radius or self.x <= self.radius:
+        if self.rect.x >= WIDTH - self.radius or self.rect.x <= self.radius:
             self.dx *= -1
          
-        if self.y >= HEIGHT - self.radius or self.y <= self.radius:
+        if self.rect.y >= HEIGHT - self.radius or self.rect.y <= self.radius:
             self.dy *= -1
 
 def randomCircle():
     return Circle(random.randrange(0, WIDTH), random.randrange(0, HEIGHT), 10, 1, 1, WHITE)
 
 
-class Objs:    
+class Objs(pygame.sprite.Sprite):    
     def __init__(self):
-        self.x = 300
-        self.y = 300
+        super().__init__()
+        self.image = pygame.Surface((5, 5))
+        self.image.fill(WHITE)
+        self.image.set_colorkey(WHITE)
+        pygame.draw.rect(self.image, RED, [0, 0,5,5])
+        self.rect = self.image.get_rect()
+        self.rect.move(WIDTH/2, HEIGHT/2)
      
     def draw(self, surface):
-        pygame.draw.rect(surface, RED, [self.x,self.y,5,5])
+        pygame.draw.rect(surface, RED, [self.rect.x,self.rect.y,5,5])
     
     def eaten(self):
-        self.x = random.randrange(0, WIDTH)
-        self.y = random.randrange(0, HEIGHT)
+        self.rect.x = random.randrange(0, WIDTH)
+        self.rect.y = random.randrange(0, HEIGHT)
         
  
 
@@ -82,32 +98,35 @@ class Objs:
 # LEFT = 4
 class Hero:
     def __init__(self, x, y):
-        self.x = x
-        self.y = y
+        self.rect = pygame.Rect(x, y, 20, 30)
         self.d = K_SPACE
         self.o = K_UP
         
     def update(self):
-        if self.d == K_DOWN and self.y < HEIGHT:
-            hero.y += 2
-        elif self.d == K_UP and self.y > 0:
-            hero.y -= 2
-        elif self.d == K_RIGHT and self.x < WIDTH:
-            hero.x += 2
-        elif self.d == K_LEFT and self.x > 0:
-            hero.x -= 2
+        if self.d == K_DOWN and self.rect.y < HEIGHT:
+            self.rect.move(0, 2)
+#             hero.y += 2
+        elif self.d == K_UP and self.rect.y > 0:
+            self.rect.move(0, -2)
+#             hero.y -= 2
+        elif self.d == K_RIGHT and self.rect.x < WIDTH:
+            self.rect.move(2, 0)
+#             hero.x += 2
+        elif self.d == K_LEFT and self.rect.x > 0:
+            self.rect.move(-2, 0)
+#             hero.x -= 2
         
     def draw(self, surface):
         # p = [(0 , -30) , (10 , 0) , (20 , -30)]
         p = [(-10 , -10) , (10 , -10) , (0 , 20)]
         if self.o == K_DOWN:
-            pos = [(self.x + p[0][0], self.y + p[0][1]), (self.x + p[1][0],self.y + p[1][1]), (self.x + p[2][0],self.y + p[2][1])];
+            pos = [(self.rect.x + p[0][0], self.rect.y + p[0][1]), (self.rect.x + p[1][0],self.rect.y + p[1][1]), (self.rect.x + p[2][0],self.rect.y + p[2][1])];
         elif self.o == K_UP:
-            pos = [(self.x + p[0][0], self.y - p[0][1]), (self.x + p[1][0],self.y - p[1][1]), (self.x + p[2][0],self.y - p[2][1])];
+            pos = [(self.rect.x + p[0][0], self.rect.y - p[0][1]), (self.rect.x + p[1][0],self.rect.y - p[1][1]), (self.rect.x + p[2][0],self.rect.y - p[2][1])];
         elif self.o == K_RIGHT:
-            pos = [(self.x + p[0][1], self.y - p[0][0]), (self.x + p[1][1],self.y - p[1][0]), (self.x + p[2][1],self.y - p[2][0])];
+            pos = [(self.rect.x + p[0][1], self.rect.y - p[0][0]), (self.rect.x + p[1][1],self.rect.y - p[1][0]), (self.rect.x + p[2][1],self.rect.y - p[2][0])];
         elif self.o == K_LEFT:
-            pos = [(self.x - p[0][1], self.y + p[0][0]), (self.x - p[1][1],self.y + p[1][0]), (self.x - p[2][1],self.y + p[2][0])];
+            pos = [(self.rect.x - p[0][1], self.rect.y + p[0][0]), (self.rect.x - p[1][1],self.rect.y + p[1][0]), (self.rect.x - p[2][1],self.rect.y + p[2][0])];
         pygame.draw.polygon(surface, BLUE, pos)
 
 
@@ -128,8 +147,12 @@ class Score:
      
 
   
-circLs = [Circle(20, 20, 10, 5, 5, WHITE) , Circle(40, 120, 10, 1, 1, WHITE) ]     
-obj = Objs() 
+# circLs = [Circle(20, 20, 10, 5, 5, WHITE) , Circle(40, 120, 10, 1, 1, WHITE) ]     
+obj = Objs()
+
+circLs = pygame.sprite.Group()
+circLs.add(Circle(20, 20, 10, 5, 5, WHITE) , Circle(40, 120, 10, 1, 1, WHITE))
+
 hero = Hero(WIDTH/2, HEIGHT/2)
 score = Score()           
             
@@ -162,18 +185,21 @@ while not done:
     
     # Draw rectangle
     hero.update()
-    if distance(hero, obj) < 10:
+    if hero.rect.colliderect(obj.rect):
         obj.eaten()
         score.points += 1
-        circLs.append(randomCircle())
+        circLs.add(randomCircle())
     # Draw objects on screen
     
     for c in circLs:
-        if distance(hero, c) < 10:
+        if hero.rect.colliderect(c.rect):
             print("Hero get hitten")
             score.lives -= 1
-        c.update()
-        c.draw(screen)
+#         c.update()
+#         c.draw(screen)
+#     if pygame.sprite.spritecollide(hero, ci, dokill, collided)
+    circLs.update()
+    circLs.draw(screen)
     
     hero.update()
     hero.draw(screen)
