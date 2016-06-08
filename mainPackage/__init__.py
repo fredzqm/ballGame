@@ -43,11 +43,11 @@ class Circle(pygame.sprite.Sprite):
         self.image = pygame.Surface((radius*2,radius*2));
         self.image.fill(WHITE)
         self.image.set_colorkey(WHITE)
-        pygame.draw.circle(self.image, color, [0 , 0], radius);
+        pygame.draw.circle(self.image, color, [radius , radius], radius);
         
         self.rect = self.image.get_rect()
 #         self.rect = pygame.rect(x, y, radius*2,radius*2);
-        self.rect.move(x, y)
+        self.rect = self.rect.move(x, y)
 #         self.rect.x = x
 #         self.rect.y = y
         self.radius = radius
@@ -59,7 +59,7 @@ class Circle(pygame.sprite.Sprite):
 #         pygame.draw.circle(surface, self.color, [self.rect.x , self.rect.y], self.radius);
         
     def update(self):
-        self.rect.move(self.dx, self.dy)
+        self.rect = self.rect.move(self.dx, self.dy)
 #         self.rect.x += self.dx
 #         self.rect.y += self.dy
         
@@ -81,7 +81,7 @@ class Objs(pygame.sprite.Sprite):
         self.image.set_colorkey(WHITE)
         pygame.draw.rect(self.image, RED, [0, 0,5,5])
         self.rect = self.image.get_rect()
-        self.rect.move(WIDTH/2, HEIGHT/2)
+        self.rect = self.rect.move(WIDTH/2, HEIGHT/2)
      
     def draw(self, surface):
         pygame.draw.rect(surface, RED, [self.rect.x,self.rect.y,5,5])
@@ -104,16 +104,16 @@ class Hero:
         
     def update(self):
         if self.d == K_DOWN and self.rect.y < HEIGHT:
-            self.rect.move(0, 2)
+            self.rect = self.rect.move(0, 2)
 #             hero.y += 2
         elif self.d == K_UP and self.rect.y > 0:
-            self.rect.move(0, -2)
+            self.rect = self.rect.move(0, -2)
 #             hero.y -= 2
         elif self.d == K_RIGHT and self.rect.x < WIDTH:
-            self.rect.move(2, 0)
+            self.rect = self.rect.move(2, 0)
 #             hero.x += 2
         elif self.d == K_LEFT and self.rect.x > 0:
-            self.rect.move(-2, 0)
+            self.rect = self.rect.move(-2, 0)
 #             hero.x -= 2
         
     def draw(self, surface):
@@ -151,7 +151,7 @@ class Score:
 obj = Objs()
 
 circLs = pygame.sprite.Group()
-circLs.add(Circle(20, 20, 10, 5, 5, WHITE) , Circle(40, 120, 10, 1, 1, WHITE))
+circLs.add(Circle(20, 20, 10, 5, 5, GREEN) , Circle(40, 120, 10, 1, 1, GREEN))
 
 hero = Hero(WIDTH/2, HEIGHT/2)
 score = Score()           
