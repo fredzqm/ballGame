@@ -63,14 +63,14 @@ class Circle(pygame.sprite.Sprite):
 #         self.rect.x += self.dx
 #         self.rect.y += self.dy
         
-        if self.rect.x >= WIDTH - self.radius or self.rect.x <= self.radius:
+        if self.rect.x >= WIDTH - 2*self.radius or self.rect.x <= 0:
             self.dx *= -1
          
-        if self.rect.y >= HEIGHT - self.radius or self.rect.y <= self.radius:
+        if self.rect.y >= HEIGHT - 2*self.radius or self.rect.y <= 0:
             self.dy *= -1
 
 def randomCircle():
-    return Circle(random.randrange(0, WIDTH), random.randrange(0, HEIGHT), 10, 1, 1, WHITE)
+    return Circle(random.randrange(0, WIDTH), random.randrange(0, HEIGHT), 10, 1, 1, GREEN)
 
 
 class Objs(pygame.sprite.Sprite):    
