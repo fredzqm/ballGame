@@ -96,9 +96,17 @@ class Objs(pygame.sprite.Sprite):
 # DOWN = 2
 # RIGHT = 3
 # LEFT = 4
-class Hero:
+class Hero(pygame.sprite.Sprite):
     def __init__(self, x, y):
-        self.rect = pygame.Rect(x, y, 20, 30)
+        super().__init__()
+        self.image = pygame.Surface((20,30))
+        self.image.fill(WHITE)
+        self.image.set_colorkey(WHITE)
+        self.rect = self.image.get_rect()
+        
+        p = [(0 , 0) , (20 , 0) , (10 , 30)]
+        pos = [(self.rect.x + p[0][0], self.rect.y - p[0][1]), (self.rect.x + p[1][0],self.rect.y - p[1][1]), (self.rect.x + p[2][0],self.rect.y - p[2][1])];
+        pygame.draw.polygon(self.image, BLUE, pos)
         self.d = K_SPACE
         self.o = K_UP
         
@@ -116,18 +124,18 @@ class Hero:
             self.rect = self.rect.move(-2, 0)
 #             hero.x -= 2
         
-    def draw(self, surface):
-        # p = [(0 , -30) , (10 , 0) , (20 , -30)]
-        p = [(-10 , -10) , (10 , -10) , (0 , 20)]
-        if self.o == K_DOWN:
-            pos = [(self.rect.x + p[0][0], self.rect.y + p[0][1]), (self.rect.x + p[1][0],self.rect.y + p[1][1]), (self.rect.x + p[2][0],self.rect.y + p[2][1])];
-        elif self.o == K_UP:
-            pos = [(self.rect.x + p[0][0], self.rect.y - p[0][1]), (self.rect.x + p[1][0],self.rect.y - p[1][1]), (self.rect.x + p[2][0],self.rect.y - p[2][1])];
-        elif self.o == K_RIGHT:
-            pos = [(self.rect.x + p[0][1], self.rect.y - p[0][0]), (self.rect.x + p[1][1],self.rect.y - p[1][0]), (self.rect.x + p[2][1],self.rect.y - p[2][0])];
-        elif self.o == K_LEFT:
-            pos = [(self.rect.x - p[0][1], self.rect.y + p[0][0]), (self.rect.x - p[1][1],self.rect.y + p[1][0]), (self.rect.x - p[2][1],self.rect.y + p[2][0])];
-        pygame.draw.polygon(surface, BLUE, pos)
+#     def draw(self, surface):
+#         # p = [(0 , -30) , (10 , 0) , (20 , -30)]
+#         p = [(-10 , -10) , (10 , -10) , (0 , 20)]
+#         if self.o == K_DOWN:
+#             pos = [(self.rect.x + p[0][0], self.rect.y + p[0][1]), (self.rect.x + p[1][0],self.rect.y + p[1][1]), (self.rect.x + p[2][0],self.rect.y + p[2][1])];
+#         elif self.o == K_UP:
+#             pos = [(self.rect.x + p[0][0], self.rect.y - p[0][1]), (self.rect.x + p[1][0],self.rect.y - p[1][1]), (self.rect.x + p[2][0],self.rect.y - p[2][1])];
+#         elif self.o == K_RIGHT:
+#             pos = [(self.rect.x + p[0][1], self.rect.y - p[0][0]), (self.rect.x + p[1][1],self.rect.y - p[1][0]), (self.rect.x + p[2][1],self.rect.y - p[2][0])];
+#         elif self.o == K_LEFT:
+#             pos = [(self.rect.x - p[0][1], self.rect.y + p[0][0]), (self.rect.x - p[1][1],self.rect.y + p[1][0]), (self.rect.x - p[2][1],self.rect.y + p[2][0])];
+#         pygame.draw.polygon(surface, BLUE, pos)
 
 
 class Score:
@@ -153,8 +161,13 @@ obj = Objs()
 circLs = pygame.sprite.Group()
 circLs.add(Circle(20, 20, 10, 5, 5, GREEN) , Circle(40, 120, 10, 1, 1, GREEN))
 
+all_items = pygame.sprite.Group()
+all_items.add(Circle(20, 20, 10, 5, 5, GREEN) , Circle(40, 120, 10, 1, 1, GREEN))
+
 hero = Hero(WIDTH/2, HEIGHT/2)
 score = Score()           
+
+all_items.add(hero, obj)
             
 # -------- Main Program Loop -----------
 while not done:
@@ -188,7 +201,9 @@ while not done:
     if hero.rect.colliderect(obj.rect):
         obj.eaten()
         score.points += 1
-        circLs.add(randomCircle())
+        newCircle = randomCircle()
+        circLs.add(newCircle)
+        all_items.add(newCircle)
     # Draw objects on screen
     
     for c in circLs:
@@ -199,11 +214,12 @@ while not done:
 #         c.draw(screen)
 #     if pygame.sprite.spritecollide(hero, ci, dokill, collided)
     circLs.update()
-    circLs.draw(screen)
+#     circLs.draw(screen)
     
     hero.update()
-    hero.draw(screen)
-    obj.draw(screen)
+#     hero.draw(screen)
+#     obj.draw(screen)
+    all_items.draw(screen)
     score.draw(screen)
     
     # --- Go ahead and update the screen with what we've drawn.
