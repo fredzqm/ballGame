@@ -13,7 +13,7 @@ from pygame import sprite
 # Define some colors
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
-BLUE = (0,0,255)
+BLUE = (0, 0, 255)
 GREEN = (0, 255, 0)
 RED = (255, 0, 0)
  
@@ -40,7 +40,7 @@ clock = pygame.time.Clock()
 class Circle(pygame.sprite.Sprite):
     def __init__(self, x, y, radius, dx, dy, color):
         super().__init__()
-        self.image = pygame.Surface((radius*2,radius*2));
+        self.image = pygame.Surface((radius * 2, radius * 2));
         self.image.fill(WHITE)
         self.image.set_colorkey(WHITE)
         pygame.draw.circle(self.image, color, [radius , radius], radius);
@@ -63,14 +63,16 @@ class Circle(pygame.sprite.Sprite):
 #         self.rect.x += self.dx
 #         self.rect.y += self.dy
         
-        if self.rect.x >= WIDTH - 2*self.radius or self.rect.x <= 0:
+        if self.rect.x >= WIDTH - 2 * self.radius or self.rect.x <= 0:
             self.dx *= -1
          
-        if self.rect.y >= HEIGHT - 2*self.radius or self.rect.y <= 0:
+        if self.rect.y >= HEIGHT - 2 * self.radius or self.rect.y <= 0:
             self.dy *= -1
 
 def randomCircle():
-    return Circle(random.randrange(0, WIDTH), random.randrange(0, HEIGHT), 10, 1, 1, GREEN)
+    dx = random.randrange(0, 5)
+    dy = random.randrange(0, 5)
+    return Circle(random.randrange(0, WIDTH), random.randrange(0, HEIGHT), 10, dx, dy, GREEN)
 
 
 class Objs(pygame.sprite.Sprite):    
@@ -79,12 +81,14 @@ class Objs(pygame.sprite.Sprite):
         self.image = pygame.Surface((5, 5))
         self.image.fill(WHITE)
         self.image.set_colorkey(WHITE)
-        pygame.draw.rect(self.image, RED, [0, 0,5,5])
+        pygame.draw.rect(self.image, RED, [0, 0, 5, 5])
         self.rect = self.image.get_rect()
-        self.rect = self.rect.move(WIDTH/2, HEIGHT/2)
+        x = random.randrange(0, WIDTH)
+        y = random.randrange(0, HEIGHT)
+        self.rect = self.rect.move(x, y)
      
     def draw(self, surface):
-        pygame.draw.rect(surface, RED, [self.rect.x,self.rect.y,5,5])
+        pygame.draw.rect(surface, RED, [self.rect.x, self.rect.y, 5, 5])
     
     def eaten(self):
         self.rect.x = random.randrange(0, WIDTH)
@@ -99,7 +103,7 @@ class Objs(pygame.sprite.Sprite):
 class Hero(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
-        self.image = pygame.Surface((20,30))
+        self.image = pygame.Surface((20, 30))
         self.image.fill(WHITE)
         self.image.set_colorkey(WHITE)
         self.rect = pygame.Rect(x, y, 20, 30)
@@ -143,32 +147,36 @@ class Score:
         self.points = 0
         self.lives = 3
         
-    def draw(self,surface):        
+    def draw(self, surface):        
         font = pygame.font.SysFont('Calibri', 20, True, False)
         points = font.render("Score: " + str(self.points), True, RED)
         if self.lives > 0:
             lives = font.render("Lives: " + str(self.lives), True, RED)
         else:
             lives = font.render("Game Over", True, RED)
-        surface.blit(points,[0,0])
-        surface.blit(lives,[0,20])
+        surface.blit(points, [0, 0])
+        surface.blit(lives, [0, 20])
      
-
   
-# circLs = [Circle(20, 20, 10, 5, 5, WHITE) , Circle(40, 120, 10, 1, 1, WHITE) ]     
-obj = Objs()
+x = random.randrange(0, WIDTH)
+y = random.randrange(0, HEIGHT)
+dx = random.randrange(0, 5)
+dy = random.randrange(0, 5)
+circ1 = Circle(x, y, 10, dx, dy, GREEN)
+circ2 = Circle(x, y, 10, dx, dy, GREEN)
 
 circLs = pygame.sprite.Group()
-circLs.add(Circle(20, 20, 10, 5, 5, GREEN) , Circle(40, 120, 10, 1, 1, GREEN))
 
-all_items = pygame.sprite.Group()
-all_items.add(Circle(20, 20, 10, 5, 5, GREEN) , Circle(40, 120, 10, 1, 1, GREEN))
+circLs.add(circ1 , circ2)
 
-hero = Hero(WIDTH/2, HEIGHT/2)
+hero = Hero(WIDTH / 2, HEIGHT / 2)
+obj = Objs()
 score = Score()           
 
-all_items.add(hero, obj)
-            
+
+all_items = pygame.sprite.Group()
+all_items.add(circ1, circ2, hero, obj)
+
 # -------- Main Program Loop -----------
 while not done:
     # --- Main event loop
@@ -208,7 +216,7 @@ while not done:
     
     for c in circLs:
         if hero.rect.colliderect(c.rect):
-            print("Hero get hitten")
+            print("Hero was hit!")
             score.lives -= 1
 #         c.update()
 #         c.draw(screen)
