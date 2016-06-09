@@ -46,22 +46,16 @@ class Circle(pygame.sprite.Sprite):
         pygame.draw.circle(self.image, color, [radius , radius], radius);
         
         self.rect = self.image.get_rect()
-#         self.rect = pygame.rect(x, y, radius*2,radius*2);
         self.rect = self.rect.move(x, y)
-#         self.rect.x = x
-#         self.rect.y = y
         self.radius = radius
         self.dx = dx
         self.dy = dy
 #         self.color = color
-        
 #     def draw(self, surface):
 #         pygame.draw.circle(surface, self.color, [self.rect.x , self.rect.y], self.radius);
         
     def update(self):
         self.rect = self.rect.move(self.dx, self.dy)
-#         self.rect.x += self.dx
-#         self.rect.y += self.dy
         
         if self.rect.x >= WIDTH - 2 * self.radius or self.rect.x <= 0:
             self.dx *= -1
@@ -110,12 +104,20 @@ class Hero(pygame.sprite.Sprite):
         self.rect = pygame.Rect(x, y, 20, 30)
         
 #         p = [(0 , 0) , (20 , 0) , (10 , 30)]
-        pos = [(0, 0), (20, 0), (10, 30)];
+        pos = [(0, 30), (20, 30), (10, 0)];
         pygame.draw.polygon(self.image, BLUE, pos)
         self.d = K_SPACE
         self.o = K_UP
         
     def update(self):
+        if not self.d == K_SPACE and not self.d == self.o:
+            if (self.d == K_UP and self.o == K_RIGHT) or (self.d == K_LEFT and self.o == K_UP) or (self.d == K_DOWN and self.o == K_LEFT) or (self.d == K_RIGHT and self.o == K_DOWN):
+                self.image = pygame.transform.rotate(self.image, 90)
+            elif (self.o == K_UP and self.d == K_RIGHT) or (self.o == K_LEFT and self.d == K_UP) or (self.o == K_DOWN and self.d == K_LEFT) or (self.o == K_RIGHT and self.d == K_DOWN):
+                self.image = pygame.transform.rotate(self.image, -90)
+            elif (self.o == K_UP and self.d == K_DOWN) or (self.o == K_DOWN and self.d == K_UP) or (self.o == K_RIGHT and self.d == K_LEFT) or (self.o == K_LEFT and self.d == K_RIGHT):
+                self.image = pygame.transform.rotate(self.image, 180)
+            self.o = self.d
         if self.d == K_DOWN and self.rect.y < HEIGHT:
             self.rect = self.rect.move(0, 2)
 #             hero.y += 2
@@ -198,7 +200,6 @@ while not done:
         elif event.type == pygame.KEYDOWN:
             if event.key == K_DOWN or event.key == K_UP or event.key == K_RIGHT or event.key == K_LEFT:
                 hero.d = event.key
-                hero.o = event.key
         elif event.type == pygame.KEYUP:
             hero.d = K_SPACE
             
