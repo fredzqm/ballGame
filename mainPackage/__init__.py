@@ -5,7 +5,8 @@ Created on Jun 6, 2016
 
 ''' 
 import pygame, math, random
-from pygame.constants import K_DOWN, K_UP, K_RIGHT, K_LEFT, K_SPACE
+from pygame.constants import K_DOWN, K_UP, K_RIGHT, K_LEFT, K_SPACE, K_q,\
+    K_RETURN
 from pygame.draw import circle
 from shutil import which
 from pygame import sprite
@@ -28,12 +29,10 @@ screen = pygame.display.set_mode(size)
 pygame.display.set_caption("My Game")
  
 # Loop until the user clicks the close button.
-done = False
-game_over = False
- 
 # Used to manage how fast the screen updates
 clock = pygame.time.Clock()
-
+all_items = pygame.sprite.Group()
+circLs = pygame.sprite.Group()
 
 # def distance(a , b):
 #     return math.sqrt((a.x - b.x)**2 + (a.y - b.y) **2)
@@ -109,7 +108,7 @@ class Hero(pygame.sprite.Sprite):
         pygame.draw.polygon(self.image, BLUE, pos)
         self.d = K_SPACE
         self.o = K_UP
-        
+    
     def update(self):
         if not self.d == K_SPACE and not self.d == self.o:
             if (self.d == K_UP and self.o == K_RIGHT) or (self.d == K_LEFT and self.o == K_UP) or (self.d == K_DOWN and self.o == K_LEFT) or (self.d == K_RIGHT and self.o == K_DOWN):
@@ -148,110 +147,127 @@ class Hero(pygame.sprite.Sprite):
 
 class Score:
     def __init__(self):
-        self.points = 0
-        self.lives = 10
+        self.init()
         
+    def init(self):
+        self.points = 0
+        self.lives = 100
+    
     def draw(self, surface):        
         font = pygame.font.SysFont('Calibri', 20, True, False)
-        points = font.render("Score: " + str(self.points), True, WHITE)
+        text1 = font.render("Score: " + str(self.points), True, WHITE)
         # health_bar 
         pygame.draw.rect(surface,(150,0,0),(0,20,100,20))
         pygame.draw.rect(surface, (0, 150, 0), (0, 20, self.lives, 20))
         if self.lives > 0:
-            lives = font.render("Health: " + str(self.lives), True, WHITE)
+            text2 = font.render("Health: " + str(self.lives), True, WHITE)
         else:
-            lives = font.render("Game Over!", True, RED)            
-        surface.blit(points, [0, 0])
-        surface.blit(lives, [0, 20])
+            text2 = font.render("Game Over!", True, RED)            
+        surface.blit(text1, [0, 0])
+        surface.blit(text2, [0, 20])
      
-  
-r1 = random.randrange(3, 15)
-x1 = random.randrange(0, WIDTH - 2 * r1)
-y1 = random.randrange(0, HEIGHT - 2 * r1)
-dx1 = random.randrange(1, 5)
-dy1 = random.randrange(1, 5)
-
-r2 = random.randrange(3, 15)
-x2 = random.randrange(0, WIDTH - 2 * r2)
-y2 = random.randrange(0, HEIGHT - 2 * r2)
-dx2 = random.randrange(1, 5)
-dy2 = random.randrange(1, 5)
-
-circ1 = Circle(x1, y1, r1, dx1, dy1, RED)
-circ2 = Circle(x2, y2, r2, dx2, dy2, RED)
-
-circLs = pygame.sprite.Group()
-
-circLs.add(circ1 , circ2)
-
+     
 hero = Hero(WIDTH / 2, HEIGHT / 2)
 obj = Objs()
-score = Score()           
+score = Score()         
 
+def restart():
+    score.init()
+    circ1 = randomCircle()
+    circ2 = randomCircle()
+    circLs.add(circ1 , circ2)
+    print("restart")
+    global all_items
+    all_items.empty()
+    all_items.add(circ1, circ2, hero, obj)
 
-all_items = pygame.sprite.Group()
-all_items.add(circ1, circ2, hero, obj)
+    
 
+def main():
+    done = False
 # -------- Main Program Loop -----------
-while not done:
-    # --- Main event loop
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            done = True
-        elif event.type == pygame.KEYDOWN:
-            if event.key == K_DOWN or event.key == K_UP or event.key == K_RIGHT or event.key == K_LEFT:
-                hero.d = event.key
-        elif event.type == pygame.KEYUP:
-            hero.d = K_SPACE
-            
-    #     print(pygame.KEYDOWN)
-    # --- Game logic should go here
- 
-    # --- Screen-clearing code goes here
- 
-    # Here, we clear the screen to white. Don't put other drawing commands
-    # above this, or they will be erased with this command.
- 
-    # If you want a background image, replace this clear with blit'ing the
-    # background image.
-    screen.fill(BLACK)
- 
-   
-    hero.update()
-    if hero.rect.colliderect(obj.rect):
-        obj.eaten()
-        score.points += 1
-        newCircle = randomCircle()
-        circLs.add(newCircle)
-        all_items.add(newCircle)
-    # Draw objects on screen
-    
-    for c in circLs:
-        if hero.rect.colliderect(c.rect):
-            print("Hero was hit!")
-            score.lives -= 1
-            #         health_bar
-#         c.update()
-#         c.draw(screen)
-#     if pygame.sprite.spritecollide(hero, ci, dokill, collided)
-    circLs.update()
-#     circLs.draw(screen)
-    
-    hero.update()
-#     hero.draw(screen)
-#     obj.draw(screen)
-    all_items.draw(screen)
-    score.draw(screen)
-    
-    # --- Go ahead and update the screen with what we've drawn.
-    pygame.display.flip()
- 
-    # --- Limit to 60 frames per second
-#     print(game_over)
-    if score.lives <= 0:
-        all_items.empty()            
+    while not done:
+        # --- Main event loop
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                done = True
+            elif event.type == pygame.KEYDOWN:
+                if event.key == K_DOWN or event.key == K_UP or event.key == K_RIGHT or event.key == K_LEFT:
+                    hero.d = event.key
+                elif event.key == K_q:
+                    pygame.quit()
+                elif event.key == K_RETURN:
+                    if score.lives == 1:
+                        restart()
+            elif event.type == pygame.KEYUP:
+                hero.d = K_SPACE
+                
+        #     print(pygame.KEYDOWN)
+        # --- Game logic should go here
+     
+        # --- Screen-clearing code goes here
+     
+        # Here, we clear the screen to white. Don't put other drawing commands
+        # above this, or they will be erased with this command.
+     
+        # If you want a background image, replace this clear with blit'ing the
+        # background image.
+        screen.fill(BLACK)
+     
        
-    clock.tick(60)
- 
+        hero.update()
+        if hero.rect.colliderect(obj.rect):
+            obj.eaten()
+            score.points += 1
+            newCircle = randomCircle()
+            circLs.add(newCircle)
+            all_items.add(newCircle)
+        # Draw objects on screen
+        
+        for c in circLs:
+            if hero.rect.colliderect(c.rect):
+                print("Hero was hit!")
+                score.lives -= 1
+    #         c.update()
+    #         c.draw(screen)
+    #     if pygame.sprite.spritecollide(hero, ci, dokill, collided)
+        circLs.update()
+    #     circLs.draw(screen)
+        
+        hero.update()
+    #     hero.draw(screen)
+    #     obj.draw(screen)
+        all_items.draw(screen)
+        score.draw(screen)
+        
+        # --- Go ahead and update the screen with what we've drawn.
+        pygame.display.flip()
+     
+        # --- Limit to 60 frames per second
+        if score.lives <= 0:
+            score.lives = 1
+            all_items.empty() 
+            circLs.empty()
+            game_over = pygame.sprite.Sprite()
+            message = pygame.Surface((400, 200))
+            
+            font = pygame.font.SysFont('Calibri', 20, True, False)
+            text1 = font.render("Game Over, Press Enter to start new game", True, WHITE)
+            text2 = font.render("Q to quit", True, WHITE)          
+            message.blit(text1, [0, 0])
+            message.blit(text2, [0, 20])
+            
+            game_over.image = message
+      
+            game_over.rect = message.get_rect()
+            game_over.rect.move_ip(200, 200)
+            all_items.add(game_over)
+           
+        clock.tick(60)
+     
 # Close the window and quit.
-pygame.quit()
+    pygame.quit()
+
+if __name__ == "__main__":
+    restart()
+    main()
