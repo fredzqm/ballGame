@@ -102,10 +102,10 @@ class Hero(pygame.sprite.Sprite):
         self.image = pygame.Surface((20,30))
         self.image.fill(WHITE)
         self.image.set_colorkey(WHITE)
-        self.rect = self.image.get_rect()
+        self.rect = pygame.Rect(x, y, 20, 30)
         
-        p = [(0 , 0) , (20 , 0) , (10 , 30)]
-        pos = [(self.rect.x + p[0][0], self.rect.y - p[0][1]), (self.rect.x + p[1][0],self.rect.y - p[1][1]), (self.rect.x + p[2][0],self.rect.y - p[2][1])];
+#         p = [(0 , 0) , (20 , 0) , (10 , 30)]
+        pos = [(0, 0), (20, 0), (10, 30)];
         pygame.draw.polygon(self.image, BLUE, pos)
         self.d = K_SPACE
         self.o = K_UP
