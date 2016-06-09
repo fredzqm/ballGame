@@ -171,7 +171,7 @@ def main():
                 elif event.key == K_q:
                     pygame.quit()
                 elif event.key == K_RETURN:
-                    if score.lives == 1:
+                    if score.lives == 0:
                         restart()
             elif event.type == pygame.KEYUP:
                 hero.d = K_SPACE
@@ -203,7 +203,7 @@ def main():
      
         # --- Limit to 60 frames per second
         if score.lives <= 0:
-            score.lives = 1
+            score.lives = 0
             all_items.empty() 
             circLs.empty()
             game_over = pygame.sprite.Sprite()
