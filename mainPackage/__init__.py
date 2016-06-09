@@ -118,13 +118,13 @@ class Hero(pygame.sprite.Sprite):
             elif (self.o == K_UP and self.d == K_DOWN) or (self.o == K_DOWN and self.d == K_UP) or (self.o == K_RIGHT and self.d == K_LEFT) or (self.o == K_LEFT and self.d == K_RIGHT):
                 self.image = pygame.transform.rotate(self.image, 180)
             self.o = self.d
-        if self.d == K_DOWN and self.rect.y < HEIGHT:
+        if self.d == K_DOWN and self.rect.y < HEIGHT - 30:
             self.rect = self.rect.move(0, 2)
 #             hero.y += 2
         elif self.d == K_UP and self.rect.y > 0:
             self.rect = self.rect.move(0, -2)
 #             hero.y -= 2
-        elif self.d == K_RIGHT and self.rect.x < WIDTH:
+        elif self.d == K_RIGHT and self.rect.x < WIDTH - 30:
             self.rect = self.rect.move(2, 0)
 #             hero.x += 2
         elif self.d == K_LEFT and self.rect.x > 0:
