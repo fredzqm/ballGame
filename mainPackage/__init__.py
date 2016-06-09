@@ -29,6 +29,7 @@ pygame.display.set_caption("My Game")
  
 # Loop until the user clicks the close button.
 done = False
+game_over = False
  
 # Used to manage how fast the screen updates
 clock = pygame.time.Clock()
@@ -148,7 +149,7 @@ class Hero(pygame.sprite.Sprite):
 class Score:
     def __init__(self):
         self.points = 0
-        self.lives = 100
+        self.lives = 10
         
     def draw(self, surface):        
         font = pygame.font.SysFont('Calibri', 20, True, False)
@@ -159,7 +160,7 @@ class Score:
         if self.lives > 0:
             lives = font.render("Health: " + str(self.lives), True, WHITE)
         else:
-            lives = font.render("Game Over", True, RED)
+            lives = font.render("Game Over!", True, RED)            
         surface.blit(points, [0, 0])
         surface.blit(lives, [0, 20])
      
@@ -246,6 +247,10 @@ while not done:
     pygame.display.flip()
  
     # --- Limit to 60 frames per second
+#     print(game_over)
+    if score.lives <= 0:
+        all_items.empty()            
+       
     clock.tick(60)
  
 # Close the window and quit.
