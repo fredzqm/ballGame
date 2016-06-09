@@ -70,9 +70,10 @@ class Circle(pygame.sprite.Sprite):
             self.dy *= -1
 
 def randomCircle():
-    dx = random.randrange(0, 5)
-    dy = random.randrange(0, 5)
-    return Circle(random.randrange(0, WIDTH), random.randrange(0, HEIGHT), 10, dx, dy, GREEN)
+    dx = random.randrange(1, 5)
+    dy = random.randrange(1, 5)
+    r = random.randrange(3, 15)
+    return Circle(random.randrange(0, WIDTH - 2 * r), random.randrange(0, HEIGHT - 2 * r), r, dx, dy, RED)
 
 
 class Objs(pygame.sprite.Sprite):    
@@ -81,18 +82,18 @@ class Objs(pygame.sprite.Sprite):
         self.image = pygame.Surface((5, 5))
         self.image.fill(WHITE)
         self.image.set_colorkey(WHITE)
-        pygame.draw.rect(self.image, RED, [0, 0, 5, 5])
+        pygame.draw.rect(self.image, GREEN, [0, 0, 5, 5])
         self.rect = self.image.get_rect()
-        x = random.randrange(0, WIDTH)
-        y = random.randrange(0, HEIGHT)
+        x = random.randrange(0, WIDTH - 5)
+        y = random.randrange(0, HEIGHT - 5)
         self.rect = self.rect.move(x, y)
      
     def draw(self, surface):
         pygame.draw.rect(surface, RED, [self.rect.x, self.rect.y, 5, 5])
     
     def eaten(self):
-        self.rect.x = random.randrange(0, WIDTH)
-        self.rect.y = random.randrange(0, HEIGHT)
+        self.rect.x = random.randrange(0, WIDTH - 5)
+        self.rect.y = random.randrange(0, HEIGHT - 5)
         
  
 
@@ -145,25 +146,36 @@ class Hero(pygame.sprite.Sprite):
 class Score:
     def __init__(self):
         self.points = 0
-        self.lives = 3
+        self.lives = 100
         
     def draw(self, surface):        
         font = pygame.font.SysFont('Calibri', 20, True, False)
-        points = font.render("Score: " + str(self.points), True, RED)
+        points = font.render("Score: " + str(self.points), True, WHITE)
+        # health_bar 
+        pygame.draw.rect(surface,(150,0,0),(0,20,100,20))
+        pygame.draw.rect(surface, (0, 150, 0), (0, 20, self.lives, 20))
         if self.lives > 0:
-            lives = font.render("Lives: " + str(self.lives), True, RED)
+            lives = font.render("Health: " + str(self.lives), True, WHITE)
         else:
             lives = font.render("Game Over", True, RED)
         surface.blit(points, [0, 0])
         surface.blit(lives, [0, 20])
      
   
-x = random.randrange(0, WIDTH)
-y = random.randrange(0, HEIGHT)
-dx = random.randrange(0, 5)
-dy = random.randrange(0, 5)
-circ1 = Circle(x, y, 10, dx, dy, GREEN)
-circ2 = Circle(x, y, 10, dx, dy, GREEN)
+r1 = random.randrange(3, 15)
+x1 = random.randrange(0, WIDTH - 2 * r1)
+y1 = random.randrange(0, HEIGHT - 2 * r1)
+dx1 = random.randrange(1, 5)
+dy1 = random.randrange(1, 5)
+
+r2 = random.randrange(3, 15)
+x2 = random.randrange(0, WIDTH - 2 * r2)
+y2 = random.randrange(0, HEIGHT - 2 * r2)
+dx2 = random.randrange(1, 5)
+dy2 = random.randrange(1, 5)
+
+circ1 = Circle(x1, y1, r1, dx1, dy1, RED)
+circ2 = Circle(x2, y2, r2, dx2, dy2, RED)
 
 circLs = pygame.sprite.Group()
 
@@ -202,9 +214,7 @@ while not done:
     # background image.
     screen.fill(BLACK)
  
-    # --- Drawing code should go here
-    
-    # Draw rectangle
+   
     hero.update()
     if hero.rect.colliderect(obj.rect):
         obj.eaten()
@@ -218,6 +228,7 @@ while not done:
         if hero.rect.colliderect(c.rect):
             print("Hero was hit!")
             score.lives -= 1
+            #         health_bar
 #         c.update()
 #         c.draw(screen)
 #     if pygame.sprite.spritecollide(hero, ci, dokill, collided)
