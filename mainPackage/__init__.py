@@ -97,28 +97,69 @@ class Hero(pygame.sprite.Sprite):
         
         pos = [(0, 30), (20, 30), (10, 0)];
         pygame.draw.polygon(self.image, BLUE, pos)
+        self.imageUp = self.image.copy()
+        
         self.d = K_SPACE
         self.o = K_UP
-    
-    def update(self):
-        if not self.d == K_SPACE and not self.d == self.o:
-            if (self.d == K_UP and self.o == K_RIGHT) or (self.d == K_LEFT and self.o == K_UP) or (self.d == K_DOWN and self.o == K_LEFT) or (self.d == K_RIGHT and self.o == K_DOWN):
-                self.image = pygame.transform.rotate(self.image, 90)
-            elif (self.o == K_UP and self.d == K_RIGHT) or (self.o == K_LEFT and self.d == K_UP) or (self.o == K_DOWN and self.d == K_LEFT) or (self.o == K_RIGHT and self.d == K_DOWN):
-                self.image = pygame.transform.rotate(self.image, -90)
-            elif (self.o == K_UP and self.d == K_DOWN) or (self.o == K_DOWN and self.d == K_UP) or (self.o == K_RIGHT and self.d == K_LEFT) or (self.o == K_LEFT and self.d == K_RIGHT):
-                self.image = pygame.transform.rotate(self.image, 180)
-            self.o = self.d
-        if self.d == K_DOWN and self.rect.y < HEIGHT - 30:
-            self.rect = self.rect.move(0, 2)
-        elif self.d == K_UP and self.rect.y > 0:
-            self.rect = self.rect.move(0, -2)
-        elif self.d == K_RIGHT and self.rect.x < WIDTH - 30:
-            self.rect = self.rect.move(2, 0)
-        elif self.d == K_LEFT and self.rect.x > 0:
-            self.rect = self.rect.move(-2, 0)
+        self.key = 0b0000
         
+        
+    def update(self):
+        if self.key == 0b1000:
+            self.rect.move_ip(0, -2)
+            self.image = self.imageUp.copy()
+        elif self.key == 0b0100:
+            self.rect.move_ip(2, 0)  
+            self.image = pygame.transform.rotate(self.imageUp, -90)
+        elif self.key == 0b0010:
+            self.rect.move_ip(0, 2)
+            self.image = pygame.transform.rotate(self.imageUp, 180)
+        elif self.key == 0b0001:
+            self.rect.move_ip(-2, 0)  
+            self.image = pygame.transform.rotate(self.imageUp, 90)
+        elif self.key == 0b1100:
+            self.rect.move_ip(1.414, -1.414)
+            self.image = pygame.transform.rotate(self.imageUp, -45)
+        elif self.key == 0b0110:
+            self.rect.move_ip(1.414, 1.414)  
+            self.image = pygame.transform.rotate(self.imageUp, -135)
+        elif self.key == 0b0011:
+            self.rect.move_ip(-1.414, 1.414)
+            self.image = pygame.transform.rotate(self.imageUp, 135)
+        elif self.key == 0b1001:
+            self.rect.move_ip(-1.414, -1.414)
+            self.image = pygame.transform.rotate(self.imageUp, 45)
 
+        if self.rect.y + self.rect.h > HEIGHT:
+            self.rect.y = HEIGHT - self.rect.h
+        elif self.rect.y < 0:
+            self.rect.y = 0
+        if self.rect.x + 30 > WIDTH:
+            self.rect.x = WIDTH - 30
+        elif self.rect.x < 0:
+            self.rect.x = 0
+
+    
+    def keyDown(self, key):
+        if key == K_UP:
+            self.key |= 0b1000
+        elif key == K_RIGHT:
+            self.key |= 0b0100
+        elif key == K_DOWN:
+            self.key |= 0b0010
+        elif key == K_LEFT:
+            self.key |= 0b0001
+    
+    def keyUp(self, key):
+        if key == K_UP:
+            self.key &= 0b0111
+        elif key == K_RIGHT:
+            self.key &= 0b1011
+        elif key == K_DOWN:
+            self.key &= 0b1101
+        elif key == K_LEFT:
+            self.key &= 0b1110
+    
 class Score:
     def __init__(self):
         self.init()
@@ -158,23 +199,22 @@ def restart():
     
 
 def main():
-    done = False
 # -------- Main Program Loop -----------
-    while not done:
+    while True:
         # --- Main event loop
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                done = True
+                return
             elif event.type == pygame.KEYDOWN:
                 if event.key == K_DOWN or event.key == K_UP or event.key == K_RIGHT or event.key == K_LEFT:
-                    hero.d = event.key
+                    hero.keyDown(event.key)
                 elif event.key == K_q:
-                    pygame.quit()
+                    return
                 elif event.key == K_RETURN:
                     if score.lives == 0:
                         restart()
             elif event.type == pygame.KEYUP:
-                hero.d = K_SPACE
+                hero.keyUp(event.key)
                 
         screen.fill(BLACK)
      
