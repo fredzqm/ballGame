@@ -92,6 +92,9 @@ class Circle(pygame.sprite.Sprite):
          
         if self.rect.y >= HEIGHT - 2 * self.radius or self.rect.y <= 0:
             self.dy *= -1
+            
+# def circileCollide(a, b):
+    
 
 def randomCircle():
     dx = random.randrange(1, 5)
@@ -261,10 +264,17 @@ def main():
             all_items.add(newCircle)
         # Draw objects on screen
         
-        for c in circLs:
-            if hero.rect.colliderect(c.rect):
-                print("Hero was hit!")
-                score.lives -= 1
+        
+        if pygame.sprite.spritecollide(hero, circLs, False):
+            print("Hero was hit!")
+            score.lives -= 1
+        
+#         ls = circLs.sprintes()
+#         for i in range(len(ls)):
+#             for j in range(i+1, len(ls)):
+#                 if ls[i].rect.colliderect(ls[j].rect):
+#                     circileCollide(ls[i], ls[j])
+        
         circLs.update()
         
         hero.update()
