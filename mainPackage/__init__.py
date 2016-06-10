@@ -209,7 +209,7 @@ class Score:
         
     def init(self):
         self.points = 0
-        self.lives = 100
+        self.lives = 1000
     
     def draw(self, surface):        
         font = pygame.font.SysFont('Calibri', 20, True, False)
