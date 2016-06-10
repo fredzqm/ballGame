@@ -91,7 +91,8 @@ class Circle(pygame.sprite.Sprite):
             self.dy *= -1
             
 def circileCollide(a, b):
-    relx, rely = b.rect.x - a.rect.x , b.rect.y - a.rect.y
+    radiusDiff = b.radius - a.radius
+    relx, rely = (b.rect.x - b.dx) - (a.rect.x - a.dx) + radiusDiff , (b.rect.y - b.dy) - (a.rect.y - b.dy) + radiusDiff
     relLen = math.sqrt(relx**2 + rely**2)
     relx, rely = relx / relLen , rely / relLen;
     ah , av = a.dy * relx - a.dx * rely , a.dx * relx + a.dy * rely
@@ -278,7 +279,7 @@ def main():
         ls = circLs.sprites()
         for i in range(len(ls)):
             for j in range(i+1, len(ls)):
-                if ls[i].rect.colliderect(ls[j].rect):
+                if distance(ls[i].rect, ls[j].rect) < ls[i].radius + ls[j].radius:
                     circileCollide(ls[i], ls[j])
         
         circLs.update()
