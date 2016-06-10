@@ -21,7 +21,7 @@ RED = (255, 0, 0)
  
 # Distance Formula
 def distance(point1, point2):
-        return math.sqrt((point1[1] - point2[1]) ** 2 + (point1[0] - point2[0]) ** 2)
+    return math.sqrt((point1[1] - point2[1]) ** 2 + (point1[0] - point2[0]) ** 2)
      
 pygame.init()
  
@@ -67,8 +67,6 @@ clock = pygame.time.Clock()
 all_items = pygame.sprite.Group()
 circLs = pygame.sprite.Group()
 
-# def distance(a , b):
-#     return math.sqrt((a.x - b.x)**2 + (a.y - b.y) **2)
 
 class Circle(pygame.sprite.Sprite):
     def __init__(self, x, y, radius, dx, dy, color):
@@ -77,7 +75,6 @@ class Circle(pygame.sprite.Sprite):
         self.image.fill(WHITE)
         self.image.set_colorkey(WHITE)
         pygame.draw.circle(self.image, color, [radius , radius], radius);
-        
         self.rect = self.image.get_rect()
         self.rect = self.rect.move(x, y)
         self.radius = radius
@@ -93,8 +90,17 @@ class Circle(pygame.sprite.Sprite):
         if self.rect.y >= HEIGHT - 2 * self.radius or self.rect.y <= 0:
             self.dy *= -1
             
-# def circileCollide(a, b):
-    
+def circileCollide(a, b):
+    relx, rely = b.rect.x - a.rect.x , b.rect.y - a.rect.y
+    relLen = math.sqrt(relx**2 + rely**2)
+    relx, rely = relx / relLen , rely / relLen;
+    ah , av = a.dy * relx - a.dx * rely , a.dx * relx + a.dy * rely
+    bh , bv = b.dy * relx - b.dx * rely , b.dx * relx + b.dy * rely
+    ratio = a.radius / b.radius
+    av2 = (2 * bv + av * (ratio - 1)) / (ratio + 1)
+    bv2 = (2 * ratio * av + bv * (1 - ratio)) / (ratio + 1)
+    a.dx, a.dy = av2 * relx - ah * rely , av2 * rely + ah * relx
+    b.dx, b.dy = bv2 * relx - bh * rely , bv2 * rely + bh * relx
 
 def randomCircle():
     dx = random.randrange(1, 5)
@@ -269,11 +275,11 @@ def main():
             print("Hero was hit!")
             score.lives -= 1
         
-#         ls = circLs.sprintes()
-#         for i in range(len(ls)):
-#             for j in range(i+1, len(ls)):
-#                 if ls[i].rect.colliderect(ls[j].rect):
-#                     circileCollide(ls[i], ls[j])
+        ls = circLs.sprites()
+        for i in range(len(ls)):
+            for j in range(i+1, len(ls)):
+                if ls[i].rect.colliderect(ls[j].rect):
+                    circileCollide(ls[i], ls[j])
         
         circLs.update()
         
