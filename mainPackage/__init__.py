@@ -91,9 +91,10 @@ class Circle(pygame.sprite.Sprite):
             self.dy *= -1
             
 def circileCollide(a, b):
-    radiusDiff = b.radius - a.radius
-    relx, rely = (b.rect.x - b.dx) - (a.rect.x - a.dx) + radiusDiff , (b.rect.y - b.dy) - (a.rect.y - b.dy) + radiusDiff
+    relx, rely = (b.rect.x + b.radius - b.dx) - (a.rect.x + a.radius - a.dx) , (b.rect.y + a.radius - b.dy) - (a.rect.y + b.radius - b.dy)
     relLen = math.sqrt(relx**2 + rely**2)
+    if relLen == 0:
+        return
     relx, rely = relx / relLen , rely / relLen;
     ah , av = a.dy * relx - a.dx * rely , a.dx * relx + a.dy * rely
     bh , bv = b.dy * relx - b.dx * rely , b.dx * relx + b.dy * rely
@@ -285,8 +286,8 @@ def main():
         circLs.update()
         
         hero.update()
-        all_items.draw(screen)
         score.draw(screen)
+        all_items.draw(screen)
         
         # --- Go ahead and update the screen with what we've drawn.
         pygame.display.flip()
