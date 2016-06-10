@@ -6,10 +6,11 @@ Created on Jun 6, 2016
 ''' 
 import pygame, math, random
 from pygame.constants import K_DOWN, K_UP, K_RIGHT, K_LEFT, K_SPACE, K_q, \
-    K_RETURN
+    K_RETURN, MOUSEBUTTONDOWN
 from pygame.draw import circle
 from shutil import which
 from pygame import sprite
+from math import *
  
 # Define some colors
 BLACK = (0, 0, 0)
@@ -18,6 +19,10 @@ BLUE = (0, 0, 255)
 GREEN = (0, 255, 0)
 RED = (255, 0, 0)
  
+# Distance Formula
+def distance(point1, point2):
+        return math.sqrt((point1[1] - point2[1]) ** 2 + (point1[0] - point2[0]) ** 2)
+     
 pygame.init()
  
 # Set the width and height of the screen [width, height]
@@ -26,7 +31,35 @@ HEIGHT = 500
 size = (WIDTH, HEIGHT)
 screen = pygame.display.set_mode(size)
  
-pygame.display.set_caption("My Game")
+pygame.display.set_caption("Ball Game")
+
+# Start Menu
+ball = pygame.image.load("ball.png")
+# background = pygame.image.load("ballgame_background.")
+title_font = pygame.font.SysFont('Calibri',75)
+title_text = title_font.render('Play Ball Game', True, WHITE)
+other_font = pygame.font.SysFont('Calibri', 25, bold = True)
+start_text = other_font.render("Start Game", True, WHITE)
+screen.blit(ball,[315,300])
+screen.blit(title_text, [125,125])
+screen.blit(start_text, [300,325])
+pygame.display.flip()
+start_game = True
+my_clock = pygame.time.Clock()
+while start_game:
+    events = pygame.event.get()
+    for event in events:
+        if event.type == pygame.QUIT:
+            exit()
+        if event.type == MOUSEBUTTONDOWN:
+            a = pygame.mouse.get_pos()  
+            if distance((355,340), a) < 40:
+                start_game = False
+            if start_game is True:
+                my_clock = 0
+            
+                
+
  
 # Loop until the user clicks the close button.
 # Used to manage how fast the screen updates
@@ -204,12 +237,12 @@ def main():
         # --- Main event loop
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                return
+                exit()
             elif event.type == pygame.KEYDOWN:
                 if event.key == K_DOWN or event.key == K_UP or event.key == K_RIGHT or event.key == K_LEFT:
                     hero.keyDown(event.key)
                 elif event.key == K_q:
-                    return
+                    exit()
                 elif event.key == K_RETURN:
                     if score.lives == 0:
                         restart()
