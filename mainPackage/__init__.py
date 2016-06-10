@@ -5,7 +5,7 @@ Created on Jun 6, 2016
 
 ''' 
 import pygame, math, random
-from pygame.constants import K_DOWN, K_UP, K_RIGHT, K_LEFT, K_SPACE, K_q,\
+from pygame.constants import K_DOWN, K_UP, K_RIGHT, K_LEFT, K_SPACE, K_q, \
     K_RETURN
 from pygame.draw import circle
 from shutil import which
@@ -70,13 +70,13 @@ def randomCircle():
 class Objs(pygame.sprite.Sprite):    
     def __init__(self):
         super().__init__()
-        self.image = pygame.Surface((5, 5))
+        self.image = pygame.Surface((10, 10))
         self.image.fill(WHITE)
         self.image.set_colorkey(WHITE)
         pygame.draw.rect(self.image, GREEN, [0, 0, 5, 5])
         self.rect = self.image.get_rect()
-        x = random.randrange(0, WIDTH - 5)
-        y = random.randrange(0, HEIGHT - 5)
+        x = random.randrange(100, WIDTH - 5)
+        y = random.randrange(40, HEIGHT - 5)
         self.rect = self.rect.move(x, y)
      
     def draw(self, surface):
@@ -172,7 +172,7 @@ class Score:
         font = pygame.font.SysFont('Calibri', 20, True, False)
         text1 = font.render("Score: " + str(self.points), True, WHITE)
         # health_bar 
-        pygame.draw.rect(surface,(150,0,0),(0,20,100,20))
+        pygame.draw.rect(surface, (150, 0, 0), (0, 20, 100, 20))
         pygame.draw.rect(surface, (0, 150, 0), (0, 20, self.lives, 20))
         if self.lives > 0:
             text2 = font.render("Health: " + str(self.lives), True, WHITE)
