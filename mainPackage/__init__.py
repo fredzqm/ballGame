@@ -90,7 +90,7 @@ class Circle(pygame.sprite.Sprite):
         if self.rect.y >= HEIGHT - 2 * self.radius or self.rect.y <= 0:
             self.dy *= -1
             
-def circileCollide(a, b):
+def circleCollide(a, b):
     relx, rely = b.rect.x - a.rect.x , b.rect.y - a.rect.y
     relLen = math.sqrt(relx**2 + rely**2)
     relx, rely = relx / relLen , rely / relLen;
@@ -208,7 +208,7 @@ class Score:
         
     def init(self):
         self.points = 0
-        self.lives = 100
+        self.lives = 1000
     
     def draw(self, surface):        
         font = pygame.font.SysFont('Calibri', 20, True, False)
@@ -279,7 +279,7 @@ def main():
         for i in range(len(ls)):
             for j in range(i+1, len(ls)):
                 if ls[i].rect.colliderect(ls[j].rect):
-                    circileCollide(ls[i], ls[j])
+                    circleCollide(ls[i], ls[j])
         
         circLs.update()
         
