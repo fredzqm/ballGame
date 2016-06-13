@@ -31,6 +31,10 @@ pygame.init()
 pygame.mixer.init()
 song = pygame.mixer.Sound("bounce.wav")
 weapon_sound = pygame.mixer.Sound("explosion.wav")
+damage = pygame.mixer.Sound("damage.wav")
+theme = pygame.mixer.Sound("theme.wav")
+
+theme.play()
 
 # Set the width and height of the screen [width, height]
 WIDTH = 700
@@ -315,11 +319,14 @@ def main():
                 
         screen.fill(BLACK)
      
+        # If ball collides with Hero
         if pygame.sprite.spritecollide(hero, circLs, False):
             print("Hero was hit!")
             score.lives -= 1
             hero.hitten()
+            damage.play(1, 500, )
         
+        # If Hero "eats" object
         if hero.rect.colliderect(obj.rect):
             obj.eaten()
             score.points += 1
@@ -328,6 +335,7 @@ def main():
             all_items.add(newCircle)
             song.play(1, 200)
             
+        # If Hero collects weapon     
         if hero.rect.colliderect(weapon.rect):
             weapon_range = 10 * weapon.radius
             for c in circLs:
