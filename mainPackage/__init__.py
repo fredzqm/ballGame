@@ -18,7 +18,7 @@ WHITE = (255, 255, 255)
 BLUE = (0, 0, 255)
 GREEN = (0, 255, 0)
 RED = (255, 0, 0)
- 
+PURPLE = (255, 51, 204)
 # Distance Formula
 def distance(point1, point2):
     return math.sqrt((point1[1] - point2[1]) ** 2 + (point1[0] - point2[0]) ** 2)
@@ -138,20 +138,37 @@ class Objs(pygame.sprite.Sprite):
 class Hero(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
-        self.image = pygame.Surface((20, 30))
-        self.image.fill(WHITE)
-        self.image.set_colorkey(WHITE)
         self.x = x;
         self.y = y;
         self.rect = pygame.Rect(x, y, 20, 30)
         
         pos = [(0, 30), (20, 30), (10, 0)];
-        pygame.draw.polygon(self.image, BLUE, pos)
-        self.imageUp = self.image.copy()
-        self.key = 0b0000
+        self.imageUpNormal = pygame.Surface((20, 30))
+        self.imageUpNormal.fill(WHITE)
+        self.imageUpNormal.set_colorkey(WHITE)
+        pygame.draw.polygon(self.imageUpNormal, BLUE, pos)
         
+        self.imageUpHitten = pygame.Surface((20, 30))
+        self.imageUpHitten.fill(WHITE)
+        self.imageUpHitten.set_colorkey(WHITE)
+        pygame.draw.polygon(self.imageUpHitten, PURPLE, pos)
+        
+        self.imageUp = self.imageUpNormal
+        self.image = self.imageUp
+        
+        self.key = 0b0000
+        self.hitTime = 0
+
+    def hitten(self):
+        self.hitTime = 10
+        self.imageUp = self.imageUpHitten
         
     def update(self):
+        if self.hitTime > 0:
+            self.hitTime -= 1
+            if self.hitTime == 0:
+                self.imageUp = self.imageUpNormal
+        
         if self.key == 0b1000:
             self.y -= 2
             self.rect = pygame.Rect(self.x, self.y, 20, 30);
@@ -277,20 +294,20 @@ def main():
                 
         screen.fill(BLACK)
      
-       
-        hero.update()
+        if pygame.sprite.spritecollide(hero, circLs, False):
+            print("Hero was hit!")
+            score.lives -= 1
+            hero.hitten()
+        
         if hero.rect.colliderect(obj.rect):
             obj.eaten()
             score.points += 1
             newCircle = randomCircle()
             circLs.add(newCircle)
             all_items.add(newCircle)
+            
+        hero.update()
         # Draw objects on screen
-        
-        
-        if pygame.sprite.spritecollide(hero, circLs, False):
-            print("Hero was hit!")
-            score.lives -= 1
         
         ls = circLs.sprites()
         for i in range(len(ls)):
