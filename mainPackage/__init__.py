@@ -24,7 +24,9 @@ def distance(point1, point2):
     return math.sqrt((point1[1] - point2[1]) ** 2 + (point1[0] - point2[0]) ** 2)
      
 pygame.init()
- 
+pygame.mixer.init()
+song = pygame.mixer.Sound("bounce.mp3")
+
 # Set the width and height of the screen [width, height]
 WIDTH = 700
 HEIGHT = 500
@@ -260,7 +262,8 @@ class Score:
      
 hero = Hero(WIDTH / 2, HEIGHT / 2)
 obj = Objs()
-score = Score()         
+score = Score()
+
 
 def restart():
     score.init()
@@ -305,6 +308,7 @@ def main():
             newCircle = randomCircle()
             circLs.add(newCircle)
             all_items.add(newCircle)
+            song.play(1, maxtime=0, fade_ms=0)
             
         hero.update()
         # Draw objects on screen
