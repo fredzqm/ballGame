@@ -19,6 +19,7 @@ BLUE = (0, 0, 255)
 GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 PURPLE = (255, 51, 204)
+ORANGE = (255, 153, 51)
 
 # Distance Formula
 def distance(point1, point2):
@@ -68,21 +69,24 @@ clock = pygame.time.Clock()
 all_items = pygame.sprite.Group()
 circLs = pygame.sprite.Group()
 
+
 # Constructs the balls
 class Circle(pygame.sprite.Sprite):
-    def __init__(self, x, y, radius, dx, dy, color):
+    def __init__(self, color):
         super().__init__()
-        self.image = pygame.Surface((radius * 2, radius * 2));
+        self.radius = random.randrange(3, 15)
+        self.dx = random.randrange(1, 5)
+        self.dy = random.randrange(1, 5)
+        self.x = random.randrange(0, WIDTH - 2 * self.radius)
+        self.y = random.randrange(0, HEIGHT - 2 * self.radius)
+        
+        self.image = pygame.Surface((self.radius * 2, self.radius * 2));
         self.image.fill(WHITE)
         self.image.set_colorkey(WHITE)
-        pygame.draw.circle(self.image, color, [radius , radius], radius);
-        self.x = x
-        self.y = y
-        self.radius = radius
-        self.dx = dx
-        self.dy = dy
+        pygame.draw.circle(self.image, color, [self.radius , self.radius], self.radius);
+        
         self.rect = pygame.Rect(self.x, self.y, self.radius*2, self.radius*2)
-    
+        
     # Updates the ball's position    
     def update(self):
         if self.x >= WIDTH - 2 * self.radius or self.x <= 0:
@@ -96,6 +100,14 @@ class Circle(pygame.sprite.Sprite):
         
         self.rect = pygame.Rect(self.x, self.y, self.radius*2, self.radius*2)
 
+class Weapon(Circle):
+    def __init__(self):
+        super().__init__(ORANGE)
+        self.dx = random.randrange(0, 2)
+        self.dy = random.randrange(0, 2)
+        
+        self.rect = pygame.Rect(self.x, self.y, self.radius*2, self.radius*2)
+    
 # Bounces circles off each other           
 def circleCollide(a, b):
     relx, rely = (b.x + b.radius - b.dx) - (a.x + a.radius - a.dx) , (b.y + a.radius - b.dy) - (a.y + b.radius - b.dy)
@@ -110,13 +122,6 @@ def circleCollide(a, b):
     bv2 = (2 * ratio * av + bv * (1 - ratio)) / (ratio + 1)
     a.dx, a.dy = av2 * relx - ah * rely , av2 * rely + ah * relx
     b.dx, b.dy = bv2 * relx - bh * rely , bv2 * rely + bh * relx
-
-# Constructs a random ball
-def randomCircle():
-    dx = random.randrange(1, 5)
-    dy = random.randrange(1, 5)
-    r = random.randrange(3, 15)
-    return Circle(random.randrange(0, WIDTH - 2 * r), random.randrange(0, HEIGHT - 2 * r), r, dx, dy, RED)
 
 # Constructs the object the Hero is to collect
 class Objs(pygame.sprite.Sprite):    
@@ -272,21 +277,23 @@ class Score:
 hero = Hero(WIDTH / 2, HEIGHT / 2)
 obj = Objs()
 score = Score()
+weapon = Weapon()
 
 
 # Restarts the game
 def restart():
     score.init()
-    circ1 = randomCircle()
-    circ2 = randomCircle()
+    circ1 = Circle(RED)
+    circ2 = Circle(RED)
     circLs.add(circ1 , circ2)
     print("restart")
     global all_items
+    global weapon
+    weapon = Weapon()
     all_items.empty()
     all_items.add(circ1, circ2, hero, obj)
-
+    all_items.add(weapon)
     
-
 def main():
 # -------- Main Program Loop -----------
     while True:
@@ -315,9 +322,21 @@ def main():
         if hero.rect.colliderect(obj.rect):
             obj.eaten()
             score.points += 1
-            newCircle = randomCircle()
+            newCircle = Circle(RED)
             circLs.add(newCircle)
             all_items.add(newCircle)
+            song.play(1, 200)
+            
+        if hero.rect.colliderect(weapon.rect):
+            for c in circLs:
+                if distance((c.x+c.radius, c.y+c.radius), (weapon.x+weapon.radius, weapon.y+weapon.radius)) < 15 *weapon.radius:
+                    all_items.remove(c)
+                    circLs.remove(c)
+                    print("removing")
+            weapon.kill()
+            global weapon
+            weapon = Weapon()
+            all_items.add(weapon)
             song.play(1, 200)
             
             
@@ -331,7 +350,7 @@ def main():
                     circleCollide(ls[i], ls[j])
         
         circLs.update()
-        
+        weapon.update()
         hero.update()
         score.draw(screen)
         all_items.draw(screen)
