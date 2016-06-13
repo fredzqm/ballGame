@@ -75,23 +75,27 @@ class Circle(pygame.sprite.Sprite):
         self.image.fill(WHITE)
         self.image.set_colorkey(WHITE)
         pygame.draw.circle(self.image, color, [radius , radius], radius);
-        self.rect = self.image.get_rect()
-        self.rect = self.rect.move(x, y)
+        self.x = x
+        self.y = y
         self.radius = radius
         self.dx = dx
         self.dy = dy
+        self.rect = pygame.Rect(self.x, self.y, self.radius*2, self.radius*2)
         
     def update(self):
-        self.rect = self.rect.move(self.dx, self.dy)
-        
-        if self.rect.x >= WIDTH - 2 * self.radius or self.rect.x <= 0:
+        if self.x >= WIDTH - 2 * self.radius or self.x <= 0:
             self.dx *= -1
          
-        if self.rect.y >= HEIGHT - 2 * self.radius or self.rect.y <= 0:
+        if self.y >= HEIGHT - 2 * self.radius or self.y <= 0:
             self.dy *= -1
-            
+        
+        self.x += self.dx
+        self.y += self.dy
+        
+        self.rect = pygame.Rect(self.x, self.y, self.radius*2, self.radius*2)
+           
 def circileCollide(a, b):
-    relx, rely = (b.rect.x + b.radius - b.dx) - (a.rect.x + a.radius - a.dx) , (b.rect.y + a.radius - b.dy) - (a.rect.y + b.radius - b.dy)
+    relx, rely = (b.x + b.radius - b.dx) - (a.x + a.radius - a.dx) , (b.y + a.radius - b.dy) - (a.y + b.radius - b.dy)
     relLen = math.sqrt(relx**2 + rely**2)
     if relLen == 0:
         return
@@ -137,51 +141,62 @@ class Hero(pygame.sprite.Sprite):
         self.image = pygame.Surface((20, 30))
         self.image.fill(WHITE)
         self.image.set_colorkey(WHITE)
+        self.x = x;
+        self.y = y;
         self.rect = pygame.Rect(x, y, 20, 30)
         
         pos = [(0, 30), (20, 30), (10, 0)];
         pygame.draw.polygon(self.image, BLUE, pos)
         self.imageUp = self.image.copy()
-        
-        self.d = K_SPACE
-        self.o = K_UP
         self.key = 0b0000
         
         
     def update(self):
         if self.key == 0b1000:
-            self.rect.move_ip(0, -2)
+            self.y -= 2
+            self.rect = pygame.Rect(self.x, self.y, 20, 30);
             self.image = self.imageUp.copy()
         elif self.key == 0b0100:
-            self.rect.move_ip(2, 0)  
+            self.x += 2
+            self.rect = pygame.Rect(self.x, self.y, 30, 30);
             self.image = pygame.transform.rotate(self.imageUp, -90)
         elif self.key == 0b0010:
-            self.rect.move_ip(0, 2)
+            self.y += 2
+            self.rect = pygame.Rect(self.x, self.y, 20, 30);
             self.image = pygame.transform.rotate(self.imageUp, 180)
         elif self.key == 0b0001:
-            self.rect.move_ip(-2, 0)  
+            self.x -= 2
+            self.rect = pygame.Rect(self.x, self.y, 20, 30);
             self.image = pygame.transform.rotate(self.imageUp, 90)
         elif self.key == 0b1100:
-            self.rect.move_ip(1.414, -1.414)
+            self.x += 1.414
+            self.y -= 1.414
+            self.rect = pygame.Rect(self.x, self.y, 30, 30);
             self.image = pygame.transform.rotate(self.imageUp, -45)
         elif self.key == 0b0110:
-            self.rect.move_ip(1.414, 1.414)  
+            self.x += 1.414
+            self.y += 1.414
+            self.rect = pygame.Rect(self.x, self.y, 30, 30);
             self.image = pygame.transform.rotate(self.imageUp, -135)
         elif self.key == 0b0011:
-            self.rect.move_ip(-1.414, 1.414)
+            self.x -= 1.414
+            self.y += 1.414
+            self.rect = pygame.Rect(self.x, self.y, 30, 30);
             self.image = pygame.transform.rotate(self.imageUp, 135)
         elif self.key == 0b1001:
-            self.rect.move_ip(-1.414, -1.414)
+            self.x -= 1.414
+            self.y -= 1.414
+            self.rect = pygame.Rect(self.x, self.y, 30, 30);
             self.image = pygame.transform.rotate(self.imageUp, 45)
 
-        if self.rect.y + self.rect.h > HEIGHT:
-            self.rect.y = HEIGHT - self.rect.h
-        elif self.rect.y < 0:
-            self.rect.y = 0
-        if self.rect.x + 30 > WIDTH:
-            self.rect.x = WIDTH - 30
-        elif self.rect.x < 0:
-            self.rect.x = 0
+        if self.y + self.rect.h > HEIGHT:
+            self.y = HEIGHT - self.rect.h
+        elif self.y < 0:
+            self.y = 0
+        if self.x + 30 > WIDTH:
+            self.x = WIDTH - 30
+        elif self.x < 0:
+            self.x = 0
 
     
     def keyDown(self, key):
