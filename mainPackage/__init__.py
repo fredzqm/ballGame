@@ -37,7 +37,6 @@ pygame.display.set_caption("Ball Game")
 
 # Start Menu
 ball = pygame.image.load("ball.png")
-# background = pygame.image.load("ballgame_background.")
 title_font = pygame.font.SysFont('Calibri',75)
 title_text = title_font.render('Play Ball Game', True, WHITE)
 other_font = pygame.font.SysFont('Calibri', 25, bold = True)
@@ -58,18 +57,15 @@ while start_game:
             if distance((355,340), a) < 40:
                 start_game = False
             if start_game is True:
-                my_clock = 0
-            
-                
-
- 
+                my_clock = 0       
+             
 # Loop until the user clicks the close button.
 # Used to manage how fast the screen updates
 clock = pygame.time.Clock()
 all_items = pygame.sprite.Group()
 circLs = pygame.sprite.Group()
 
-
+# Constructs the balls
 class Circle(pygame.sprite.Sprite):
     def __init__(self, x, y, radius, dx, dy, color):
         super().__init__()
@@ -83,7 +79,8 @@ class Circle(pygame.sprite.Sprite):
         self.dx = dx
         self.dy = dy
         self.rect = pygame.Rect(self.x, self.y, self.radius*2, self.radius*2)
-        
+    
+    # Updates the ball's position    
     def update(self):
         if self.x >= WIDTH - 2 * self.radius or self.x <= 0:
             self.dx *= -1
@@ -95,8 +92,9 @@ class Circle(pygame.sprite.Sprite):
         self.y += self.dy
         
         self.rect = pygame.Rect(self.x, self.y, self.radius*2, self.radius*2)
-           
-def circileCollide(a, b):
+
+# Bounces circles off each other           
+def circleCollide(a, b):
     relx, rely = (b.x + b.radius - b.dx) - (a.x + a.radius - a.dx) , (b.y + a.radius - b.dy) - (a.y + b.radius - b.dy)
     relLen = math.sqrt(relx**2 + rely**2)
     if relLen == 0:
@@ -110,13 +108,14 @@ def circileCollide(a, b):
     a.dx, a.dy = av2 * relx - ah * rely , av2 * rely + ah * relx
     b.dx, b.dy = bv2 * relx - bh * rely , bv2 * rely + bh * relx
 
+# Constructs a random ball
 def randomCircle():
     dx = random.randrange(1, 5)
     dy = random.randrange(1, 5)
     r = random.randrange(3, 15)
     return Circle(random.randrange(0, WIDTH - 2 * r), random.randrange(0, HEIGHT - 2 * r), r, dx, dy, RED)
 
-
+# Constructs the object the Hero is to collect
 class Objs(pygame.sprite.Sprite):    
     def __init__(self):
         super().__init__()
@@ -128,15 +127,17 @@ class Objs(pygame.sprite.Sprite):
         x = random.randrange(100, WIDTH - 5)
         y = random.randrange(40, HEIGHT - 5)
         self.rect = self.rect.move(x, y)
-     
+    
+    # Draws the object 
     def draw(self, surface):
         pygame.draw.rect(surface, RED, [self.rect.x, self.rect.y, 5, 5])
     
+    # Moves the object after the Hero "eats" it
     def eaten(self):
         self.rect.x = random.randrange(0, WIDTH - 5)
         self.rect.y = random.randrange(0, HEIGHT - 5)
         
- 
+# Constructs the hero 
 class Hero(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
@@ -149,7 +150,7 @@ class Hero(pygame.sprite.Sprite):
         self.imageUpNormal.fill(WHITE)
         self.imageUpNormal.set_colorkey(WHITE)
         pygame.draw.polygon(self.imageUpNormal, BLUE, pos)
-        
+
         self.imageUpHitten = pygame.Surface((20, 30))
         self.imageUpHitten.fill(WHITE)
         self.imageUpHitten.set_colorkey(WHITE)
@@ -160,11 +161,13 @@ class Hero(pygame.sprite.Sprite):
         
         self.key = 0b0000
         self.hitTime = 0
-
+    
+    # Changes Hero color if hit by ball
     def hitten(self):
         self.hitTime = 10
         self.imageUp = self.imageUpHitten
-        
+
+    # Updates the Hero's position 
     def update(self):
         if self.hitTime > 0:
             self.hitTime -= 1
@@ -217,7 +220,7 @@ class Hero(pygame.sprite.Sprite):
         elif self.x < 0:
             self.x = 0
 
-    
+    # Setting a bit-key to the arrow keys when a key is pressed
     def keyDown(self, key):
         if key == K_UP:
             self.key |= 0b1000
@@ -228,6 +231,7 @@ class Hero(pygame.sprite.Sprite):
         elif key == K_LEFT:
             self.key |= 0b0001
     
+    # Setting a bit-key to the arrow keys when a key is released 
     def keyUp(self, key):
         if key == K_UP:
             self.key &= 0b0111
@@ -237,7 +241,8 @@ class Hero(pygame.sprite.Sprite):
             self.key &= 0b1101
         elif key == K_LEFT:
             self.key &= 0b1110
-    
+            
+# Displays the score and health a player has    
 class Score:
     def __init__(self):
         self.init()
@@ -246,6 +251,7 @@ class Score:
         self.points = 0
         self.lives = 1000
     
+    # Draws the score and health
     def draw(self, surface):        
         font = pygame.font.SysFont('Calibri', 20, True, False)
         text1 = font.render("Score: " + str(self.points), True, WHITE)
@@ -259,12 +265,13 @@ class Score:
         surface.blit(text1, [0, 0])
         surface.blit(text2, [0, 20])
      
-     
+# Initializes hero, obj, score     
 hero = Hero(WIDTH / 2, HEIGHT / 2)
 obj = Objs()
 score = Score()
 
 
+# Restarts the game
 def restart():
     score.init()
     circ1 = randomCircle()
@@ -317,7 +324,7 @@ def main():
         for i in range(len(ls)):
             for j in range(i+1, len(ls)):
                 if distance(ls[i].rect, ls[j].rect) < ls[i].radius + ls[j].radius:
-                    circileCollide(ls[i], ls[j])
+                    circleCollide(ls[i], ls[j])
         
         circLs.update()
         
