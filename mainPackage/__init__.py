@@ -324,7 +324,7 @@ def main():
             print("Hero was hit!")
             score.lives -= 1
             hero.hitten()
-            damage.play(1, 500, )
+            damage.play(1, 500)
         
         # If Hero "eats" object
         if hero.rect.colliderect(obj.rect):
@@ -368,7 +368,7 @@ def main():
         
         # --- Go ahead and update the screen with what we've drawn.
         pygame.display.flip()
-     
+        
         # --- Limit to 60 frames per second
         if score.lives <= 0:
             score.lives = 0
@@ -377,12 +377,13 @@ def main():
             game_over = pygame.sprite.Sprite()
             message = pygame.Surface((400, 200))
             
+            # Game Over
             font = pygame.font.SysFont('Calibri', 20, True, False)
             text1 = font.render("Game Over, Press Enter to start new game", True, WHITE)
             text2 = font.render("Q to quit", True, WHITE)          
             message.blit(text1, [0, 0])
             message.blit(text2, [0, 20])
-            
+                            
             game_over.image = message
       
             game_over.rect = message.get_rect()
