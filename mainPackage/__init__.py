@@ -19,13 +19,16 @@ BLUE = (0, 0, 255)
 GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 PURPLE = (255, 51, 204)
+
 # Distance Formula
 def distance(point1, point2):
     return math.sqrt((point1[1] - point2[1]) ** 2 + (point1[0] - point2[0]) ** 2)
      
 pygame.init()
+
+# Add Sound
 pygame.mixer.init()
-song = pygame.mixer.Sound("bounce.mp3")
+song = pygame.mixer.Sound("bounce.wav")
 
 # Set the width and height of the screen [width, height]
 WIDTH = 700
@@ -315,7 +318,8 @@ def main():
             newCircle = randomCircle()
             circLs.add(newCircle)
             all_items.add(newCircle)
-            song.play(1, maxtime=0, fade_ms=0)
+            song.play(1, 200)
+            
             
         hero.update()
         # Draw objects on screen
