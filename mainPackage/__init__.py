@@ -27,9 +27,10 @@ def distance(point1, point2):
      
 pygame.init()
 
-# Add Sound
+# Add Sounds
 pygame.mixer.init()
 song = pygame.mixer.Sound("bounce.wav")
+weapon_sound = pygame.mixer.Sound("explosion.wav")
 
 # Set the width and height of the screen [width, height]
 WIDTH = 700
@@ -41,13 +42,13 @@ pygame.display.set_caption("Ball Game")
 
 # Start Menu
 ball = pygame.image.load("ball.png")
-title_font = pygame.font.SysFont('Calibri',75)
+title_font = pygame.font.SysFont('Calibri', 75)
 title_text = title_font.render('Play Ball Game', True, WHITE)
-other_font = pygame.font.SysFont('Calibri', 25, bold = True)
+other_font = pygame.font.SysFont('Calibri', 25, bold=True)
 start_text = other_font.render("Start Game", True, WHITE)
-screen.blit(ball,[315,300])
-screen.blit(title_text, [125,125])
-screen.blit(start_text, [300,325])
+screen.blit(ball, [315, 300])
+screen.blit(title_text, [125, 125])
+screen.blit(start_text, [300, 325])
 pygame.display.flip()
 start_game = True
 my_clock = pygame.time.Clock()
@@ -58,7 +59,7 @@ while start_game:
             exit()
         if event.type == MOUSEBUTTONDOWN:
             a = pygame.mouse.get_pos()  
-            if distance((355,340), a) < 40:
+            if distance((355, 340), a) < 40:
                 start_game = False
             if start_game is True:
                 my_clock = 0       
@@ -85,7 +86,7 @@ class Circle(pygame.sprite.Sprite):
         self.image.set_colorkey(WHITE)
         pygame.draw.circle(self.image, color, [self.radius , self.radius], self.radius);
         
-        self.rect = pygame.Rect(self.x, self.y, self.radius*2, self.radius*2)
+        self.rect = pygame.Rect(self.x, self.y, self.radius * 2, self.radius * 2)
         
     # Updates the ball's position    
     def update(self):
@@ -98,7 +99,7 @@ class Circle(pygame.sprite.Sprite):
         self.x += self.dx
         self.y += self.dy
         
-        self.rect = pygame.Rect(self.x, self.y, self.radius*2, self.radius*2)
+        self.rect = pygame.Rect(self.x, self.y, self.radius * 2, self.radius * 2)
 
 class Weapon(Circle):
     def __init__(self):
@@ -106,12 +107,12 @@ class Weapon(Circle):
         self.dx = random.randrange(0, 2)
         self.dy = random.randrange(0, 2)
         
-        self.rect = pygame.Rect(self.x, self.y, self.radius*2, self.radius*2)
+        self.rect = pygame.Rect(self.x, self.y, self.radius * 2, self.radius * 2)
     
 # Bounces circles off each other           
 def circleCollide(a, b):
     relx, rely = (b.x + b.radius - b.dx) - (a.x + a.radius - a.dx) , (b.y + a.radius - b.dy) - (a.y + b.radius - b.dy)
-    relLen = math.sqrt(relx**2 + rely**2)
+    relLen = math.sqrt(relx ** 2 + rely ** 2)
     if relLen == 0:
         return
     relx, rely = relx / relLen , rely / relLen;
@@ -257,7 +258,7 @@ class Score:
         
     def init(self):
         self.points = 0
-        self.lives = 1000
+        self.lives = 100
     
     # Draws the score and health
     def draw(self, surface):        
@@ -328,16 +329,18 @@ def main():
             song.play(1, 200)
             
         if hero.rect.colliderect(weapon.rect):
+            weapon_range = 10 * weapon.radius
             for c in circLs:
-                if distance((c.x+c.radius, c.y+c.radius), (weapon.x+weapon.radius, weapon.y+weapon.radius)) < 15 *weapon.radius:
+                if distance((c.x + c.radius, c.y + c.radius), (weapon.x + weapon.radius, weapon.y + weapon.radius)) < weapon_range:
                     all_items.remove(c)
                     circLs.remove(c)
                     print("removing")
+            pygame.draw.circle(screen, ORANGE, (weapon.x, weapon.y), weapon_range)        
             weapon.kill()
             global weapon
             weapon = Weapon()
             all_items.add(weapon)
-            song.play(1, 200)
+            weapon_sound.play(1, 500)
             
             
         hero.update()
@@ -345,7 +348,7 @@ def main():
         
         ls = circLs.sprites()
         for i in range(len(ls)):
-            for j in range(i+1, len(ls)):
+            for j in range(i + 1, len(ls)):
                 if distance(ls[i].rect, ls[j].rect) < ls[i].radius + ls[j].radius:
                     circleCollide(ls[i], ls[j])
         
